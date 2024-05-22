@@ -1,0 +1,24 @@
+{
+  "name": "com.greenbamboogames.projectnotes",
+  "version": "0.0.1",
+  "displayName": "Project Notes!",
+  "description": "",
+  "unity": "2021.3",
+  "documentationUrl": "https://github.com/SolarianZ/UnityProjectNotes",
+  "changelogUrl": "https://github.com/SolarianZ/UnityProjectNotes/releases",
+  "licensesUrl": "https://github.com/SolarianZ/UnityProjectNotes/blob/main/LICENSE",
+  "keywords": [
+    "Note",
+    "Memo",
+    "Tips",
+    "Reminder",
+    "Hint"
+  ],
+  "author": {
+    "name": "ZQY",
+    "email": "vdergow@hotmail.com",
+    "url": ""
+  },
+  "type": "tool",
+  "hideInEditor": false
+}
