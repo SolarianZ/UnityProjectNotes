@@ -31,6 +31,12 @@ namespace GBG.ProjectNotes.Editor
         }
 
 
+        // Allow to clear remote read status
+        public void UpdateGuid()
+        {
+            guid = DateTime.UtcNow.Ticks;
+        }
+
         public void UpdateContent(string newContent, bool addOldContentToHistory = true)
         {
             if (addOldContentToHistory && contentHistory.Count < MaxHistoryLength)
