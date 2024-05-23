@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.Toolbars;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -131,6 +130,7 @@ namespace GBG.ProjectNotes.Editor
         private bool _createSettingsButtonVisible;
         private Button _createSettingsButton;
         private VisualElement _mainViewContainer;
+        private ListView _noteEntryListView;
         private ProjectNoteContentView _contentView;
 
 
@@ -201,12 +201,12 @@ namespace GBG.ProjectNotes.Editor
             };
             categoryContainer.Add(categoryGroup);
 
-            categoryGroup.Add(new ToolbarToggle { text = "A111111111111" });
-            categoryGroup.Add(new ToolbarToggle { text = "B111111111111" });
-            categoryGroup.Add(new ToolbarToggle { text = "C111111111111" });
-            categoryGroup.Add(new ToolbarToggle { text = "D111111111111" });
-            categoryGroup.Add(new ToolbarToggle { text = "E111111111111" });
-            categoryGroup.Add(new ToolbarToggle { text = "F111111111111" });
+            categoryGroup.Add(new CategoryItemToggle { text = "A111111111111" });
+            categoryGroup.Add(new CategoryItemToggle { text = "B111111111111" });
+            categoryGroup.Add(new CategoryItemToggle { text = "C111111111111" });
+            categoryGroup.Add(new CategoryItemToggle { text = "D111111111111" });
+            categoryGroup.Add(new CategoryItemToggle { text = "E111111111111" });
+            categoryGroup.Add(new CategoryItemToggle { text = "F111111111111" });
 
             #endregion
 
@@ -221,15 +221,28 @@ namespace GBG.ProjectNotes.Editor
 
             #region Note List
 
-            VisualElement temp1 = new VisualElement();
-            noteContainer.Add(temp1);
+            _noteEntryListView = new ListView
+            {
+                itemsSource = _filteredNotes,
+                fixedItemHeight = 24,
+                makeItem = ProjectNoteListItemLabel.MakeItem,
+                bindItem = BindNoteListItemView,
+                reorderable = false,
+                selectionType = SelectionType.Single,
+            };
+#if UNITY_2022_3_OR_NEWER
+            _noteEntryListView.selectionChanged += OnNoteEntryListSelectionChanged;
+#else
+            _noteEntryListView.onSelectionChange += OnNoteEntryListSelectionChanged;
+#endif
+            noteContainer.Add(_noteEntryListView);
 
             #endregion
 
 
             #region Note Content
 
-            ProjectNoteContentView _contentView = new ProjectNoteContentView();
+            _contentView = new ProjectNoteContentView();
             noteContainer.Add(_contentView);
 
             #endregion
@@ -248,5 +261,23 @@ namespace GBG.ProjectNotes.Editor
                 resultContainer.flexedPane.style.minWidth = 200;
             });
         }
+
+
+        #region Note List View
+
+        public void BindNoteListItemView(VisualElement element, int index)
+        {
+            ProjectNoteListItemLabel itemView = (ProjectNoteListItemLabel)element;
+            ProjectNoteItem noteItem = Settings.Notes[index];
+            itemView.SetupView(noteItem.title, !LocalCache.IsRead(noteItem.guid));
+        }
+
+        private void OnNoteEntryListSelectionChanged(IEnumerable<object> enumerable)
+        {
+            ProjectNoteItem note = (ProjectNoteItem)_noteEntryListView.selectedItem;
+            _contentView.SetNote(note);
+        }
+
+        #endregion
     }
 }

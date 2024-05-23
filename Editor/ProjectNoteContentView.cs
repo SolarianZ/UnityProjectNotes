@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using System;
 using UnityEngine.UIElements;
 
 namespace GBG.ProjectNotes.Editor
@@ -6,8 +6,11 @@ namespace GBG.ProjectNotes.Editor
     public class ProjectNoteContentView : VisualElement
     {
         private readonly Label _titleLabel;
+        private readonly Label _authorLabel;
         private readonly Label _contentLabel;
         private ProjectNoteItem _note;
+
+        public event Action<ProjectNoteItem> readStatusChanged;
 
 
         public ProjectNoteContentView()
@@ -50,20 +53,40 @@ namespace GBG.ProjectNotes.Editor
             };
             titleContainer.Add(historyDropdown);
 
-            _contentLabel = new Label // TODO: Put int ScrollView
+            _authorLabel = new Label
+            {
+                text = "-",
+                enableRichText = true,
+            };
+#if UNITY_2022_3_OR_NEWER
+            ((ITextSelection)_authorLabel).isSelectable = true;
+#endif
+            Add(_authorLabel);
+
+            ScrollView contentScrollView = new ScrollView
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    marginTop = 4,
+                }
+            };
+            Add(contentScrollView);
+            _contentLabel = new Label
             {
                 text = "-",
                 enableRichText = true,
                 style =
                 {
                     flexGrow = 1,
+                    fontSize = 14,
                     whiteSpace = WhiteSpace.Normal,
                 }
             };
 #if UNITY_2022_3_OR_NEWER
             ((ITextSelection)_contentLabel).isSelectable = true;
 #endif
-            Add(_contentLabel);
+            contentScrollView.Add(_contentLabel);
 
             Button markButton = new Button(MarkStatus)
             {
@@ -81,12 +104,29 @@ namespace GBG.ProjectNotes.Editor
         public void SetNote(ProjectNoteItem note)
         {
             _note = note;
-            _contentLabel.text = _note?.content;
+            _titleLabel.text = _note?.title ?? "-";
+            _authorLabel.text = _note?.author ?? "-";
+            _contentLabel.text = _note?.content ?? "-";
         }
 
         private void MarkStatus()
         {
-            Debug.LogError("TODO: MarkStatus");
+            if (_note == null)
+            {
+                return;
+            }
+
+            bool read = ProjectNotesLocalCache.instance.IsRead(_note.guid);
+            if (read)
+            {
+                ProjectNotesLocalCache.instance.MarkAsUnread(_note.guid);
+            }
+            else
+            {
+                ProjectNotesLocalCache.instance.MarkAsRead(_note.guid);
+            }
+
+            readStatusChanged?.Invoke(_note);
         }
     }
 }

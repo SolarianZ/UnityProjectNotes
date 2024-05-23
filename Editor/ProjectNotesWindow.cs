@@ -1,8 +1,5 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Toolbars;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,6 +9,11 @@ namespace GBG.ProjectNotes.Editor
     {
         #region Static
 
+        public static ProjectNotesSettings Settings => ProjectNotesSettings.instance;
+        internal static ProjectNotesLocalCache LocalCache => ProjectNotesLocalCache.instance;
+        private static ProjectNotesWindow _windowInstance;
+
+
         [MenuItem("Tools/Bamboo/Project Notes")]
         public static void Open()
         {
@@ -20,20 +22,14 @@ namespace GBG.ProjectNotes.Editor
 
         public static bool HasUnreadNotes()
         {
-            ProjectNotesSettings settings = ProjectNotesSettings.instance;
-            if (!settings)
+            if (!Settings)
             {
                 return false;
             }
 
-            ProjectNotesLocalCache localCache = ProjectNotesLocalCache.instance;
-            bool hasUnreadNotes = localCache.HasUnreadNotes(settings.Notes);
+            bool hasUnreadNotes = LocalCache.HasUnreadNotes(Settings.Notes);
             return hasUnreadNotes;
         }
-
-
-        private static ProjectNotesWindow _windowInstance;
-
 
         [InitializeOnLoadMethod]
         private static void Initialize()
@@ -54,23 +50,33 @@ namespace GBG.ProjectNotes.Editor
         #endregion
 
 
+        private readonly List<ProjectNoteItem> _filteredNotes = new List<ProjectNoteItem>();
+
 
         private void OnEnable()
         {
             titleContent = EditorGUIUtility.IconContent(EditorGUIUtility.isProSkin ? "d_console.infoicon.sml" : "console.infoicon.sml");
             titleContent.text = "Project Notes";
             minSize = new Vector2(200, 200);
+
+            _filteredNotes.Clear();
+            _filteredNotes.AddRange(Settings.Notes);
+        }
+
+        private void OnFocus()
+        {
+            // TODO: refresh view, need check null!
         }
 
         private void Update()
         {
-            if (!ProjectNotesSettings.instance && !_createSettingsButtonVisible)
+            if (!Settings && !_createSettingsButtonVisible)
             {
                 _createSettingsButtonVisible = true;
                 _createSettingsButton.style.display = DisplayStyle.Flex;
                 _mainViewContainer.style.display = DisplayStyle.None;
             }
-            else if (ProjectNotesSettings.instance && _createSettingsButtonVisible)
+            else if (Settings && _createSettingsButtonVisible)
             {
                 _createSettingsButtonVisible = false;
                 _createSettingsButton.style.display = DisplayStyle.None;
@@ -86,14 +92,14 @@ namespace GBG.ProjectNotes.Editor
             // Settings
             menu.AddItem(new GUIContent("Inspect Settings Asset"), false, () =>
             {
-                Selection.activeObject = ProjectNotesSettings.instance;
+                Selection.activeObject = Settings;
             });
             menu.AddSeparator("");
 
             // Debug
             menu.AddItem(new GUIContent("[Debug] Inspect Local Cache Asset"), false, () =>
             {
-                Selection.activeObject = ProjectNotesLocalCache.instance;
+                Selection.activeObject = LocalCache;
             });
         }
 
