@@ -30,9 +30,7 @@ namespace GBG.ProjectNotes.Editor
             object toolbarObj = toolbarType.GetField("get").GetValue(null);
             VisualElement toolbarRoot = (VisualElement)toolbarType.GetField("m_Root",
                 BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(toolbarObj);
-            VisualElement toolbarZoneLeft = toolbarRoot.Q("ToolbarZoneLeftAlign");
-            VisualElement customToolbarLeft = toolbarZoneLeft.Q("custom-toolbar-left");
-            VisualElement parent = customToolbarLeft ?? toolbarZoneLeft;
+            VisualElement toolbarZonePlayMode = toolbarRoot.Q("ToolbarZonePlayMode");
 
             EditorToolbarButton entryButton = new EditorToolbarButton(Open)
             {
@@ -40,11 +38,11 @@ namespace GBG.ProjectNotes.Editor
                 icon = EditorGUIUtility.Load(EditorGUIUtility.isProSkin ? "d_console.infoicon.sml" : "console.infoicon.sml") as Texture2D,
                 style =
                     {
-                        marginLeft = 10,
-                        marginRight = 10,
+                        marginLeft = 8,
+                        marginRight = 8,
                     }
             };
-            parent.Add(entryButton);
+            toolbarZonePlayMode.Insert(0, entryButton);
 
             Image entryIconImage = entryButton.Q<Image>();
             entryIconImage.style.alignItems = Align.FlexEnd;

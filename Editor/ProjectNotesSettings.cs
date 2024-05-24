@@ -18,14 +18,15 @@ namespace GBG.ProjectNotes.Editor
             {
                 if (!_instance)
                 {
-                    ProjectNotesSettings[] instances = Resources.FindObjectsOfTypeAll<ProjectNotesSettings>();
-                    if (instances.Length == 0)
+                    // "Resources.FindObjectsOfTypeAll<T>" can not find assets that have not been loaded.
+                    string[] guids = AssetDatabase.FindAssets($"t:{nameof(ProjectNotesSettings)}");
+                    if (guids.Length == 0)
                     {
                         return null;
                     }
 
-                    _instance = instances[0];
-                    if (instances.Length > 1)
+                    _instance = AssetDatabase.LoadAssetAtPath<ProjectNotesSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
+                    if (guids.Length > 1)
                     {
                         UDebug.LogWarning($"[Project Notes] Multiple {nameof(ProjectNotesSettings)} instances found, using the first one. Please remove duplicates.", _instance);
                     }

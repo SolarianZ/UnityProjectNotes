@@ -34,6 +34,11 @@ namespace GBG.ProjectNotes.Editor
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
+            if (Application.isBatchMode)
+            {
+                return;
+            }
+
             EditorApplication.update -= OnEditorUpdate;
             EditorApplication.update += OnEditorUpdate;
         }
