@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UDebug = UnityEngine.Debug;
@@ -47,24 +46,25 @@ namespace GBG.ProjectNotes.Editor
 
             ProjectNotesSettings instance = CreateInstance<ProjectNotesSettings>();
             AssetDatabase.CreateAsset(instance, savePath);
+            EditorGUIUtility.PingObject(instance);
             UDebug.Log($"[Project Notes] Created new {nameof(ProjectNotesSettings)} asset at {savePath}.", instance);
         }
 
         #endregion
 
 
-        public string VersionGuid => _versionGuid;
+        public long VersionGuid => _versionGuid;
         public List<ProjectNoteItem> Notes => _notes;
 
         [SerializeField]
-        private string _versionGuid = Guid.NewGuid().ToString();
+        private long _versionGuid = ProjectNoteUtility.NewGuid();
         [SerializeField]
         private List<ProjectNoteItem> _notes = new List<ProjectNoteItem>();
 
         [ContextMenu("[Debug] Generate New Version Guid")]
         public void UpdateVersionGuid()
         {
-            _versionGuid = Guid.NewGuid().ToString();
+            _versionGuid = ProjectNoteUtility.NewGuid();
             ForceSave();
         }
 

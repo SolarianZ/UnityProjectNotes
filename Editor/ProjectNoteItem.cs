@@ -9,7 +9,7 @@ namespace GBG.ProjectNotes.Editor
         public static int MaxHistoryLength = 8;
         public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss:fff";
 
-        public long guid = DateTime.UtcNow.Ticks;
+        public long guid = ProjectNoteUtility.NewGuid();
         public string title;
         public string content;
         public string category;
@@ -34,7 +34,7 @@ namespace GBG.ProjectNotes.Editor
         // Allow to clear remote read status
         public void UpdateGuid()
         {
-            guid = DateTime.UtcNow.Ticks;
+            guid = ProjectNoteUtility.NewGuid();
         }
 
         public void UpdateContent(string newContent, bool addOldContentToHistory = true)
@@ -44,7 +44,7 @@ namespace GBG.ProjectNotes.Editor
                 contentHistory.Add(new History(guid, content));
             }
 
-            guid = DateTime.UtcNow.Ticks;
+            guid = ProjectNoteUtility.NewGuid();
             content = newContent;
         }
 

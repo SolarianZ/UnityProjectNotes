@@ -65,7 +65,10 @@ namespace GBG.ProjectNotes.Editor
             minSize = new Vector2(200, 200);
 
             _filteredNotes.Clear();
-            _filteredNotes.AddRange(Settings.Notes);
+            if (Settings)
+            {
+                _filteredNotes.AddRange(Settings.Notes);
+            }
         }
 
         private void OnFocus()
@@ -102,6 +105,10 @@ namespace GBG.ProjectNotes.Editor
             menu.AddSeparator("");
 
             // Debug
+            menu.AddItem(new GUIContent("[Debug] Generate New Guid to Clipboard"), false, () =>
+            {
+                GUIUtility.systemCopyBuffer = ProjectNoteUtility.NewGuid().ToString();
+            });
             menu.AddItem(new GUIContent("[Debug] Inspect Local Cache Asset"), false, () =>
             {
                 Selection.activeObject = LocalCache;
