@@ -55,6 +55,7 @@ namespace GBG.ProjectNotes.Editor
         #endregion
 
 
+        private List<string> _categories;
         private readonly List<ProjectNoteItem> _filteredNotes = new List<ProjectNoteItem>();
 
 
@@ -67,13 +68,19 @@ namespace GBG.ProjectNotes.Editor
             _filteredNotes.Clear();
             if (Settings)
             {
+                _categories = Settings.CollectCategories();
                 _filteredNotes.AddRange(Settings.Notes);
+            }
+            else
+            {
+                _categories = new List<string>(0);
             }
         }
 
         private void OnFocus()
         {
             // TODO: refresh view, need check null!
+            // TODO: update categories and filtered notes
         }
 
         private void Update()

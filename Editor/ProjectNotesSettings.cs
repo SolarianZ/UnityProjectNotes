@@ -10,6 +10,8 @@ namespace GBG.ProjectNotes.Editor
     {
         #region Static
 
+        public const string CategoryAll = "All";
+
         private static ProjectNotesSettings _instance;
         public static ProjectNotesSettings instance
         {
@@ -60,6 +62,35 @@ namespace GBG.ProjectNotes.Editor
         private long _versionGuid = ProjectNoteUtility.NewGuid();
         [SerializeField]
         private List<ProjectNoteItem> _notes = new List<ProjectNoteItem>();
+
+
+        public List<string> CollectCategories(bool addCategoryAll = true)
+        {
+            HashSet<string> categoriesHashSet = new HashSet<string>();
+            foreach (ProjectNoteItem note in _notes)
+            {
+                string category = note.category?.Trim();
+                if (string.IsNullOrEmpty(category))
+                {
+                    continue;
+                }
+
+                if (category == CategoryAll)
+                {
+                    continue;
+                }
+
+                categoriesHashSet.Add(category);
+            }
+
+            List<string> categories = new List<string>(categoriesHashSet.Count + 1);
+            if (addCategoryAll)
+            {
+                categories.Add(CategoryAll);
+            }
+            categories.AddRange(categoriesHashSet);
+            return categories;
+        }
 
         [ContextMenu("[Debug] Generate New Version Guid")]
         public void UpdateVersionGuid()
