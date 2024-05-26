@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GBG.ProjectNotes.Editor
 {
@@ -9,6 +10,28 @@ namespace GBG.ProjectNotes.Editor
 
 
         public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss:fff";
+
+        public static string FormatTimestamp(long timestamp)
+        {
+            return new DateTime(timestamp).ToString(DateTimeFormat);
+        }
+
+        public static void CollectHistoryTimestamps(NoteEntry note, List<long> timestamps)
+        {
+            timestamps.Clear();
+            if (note == null)
+            {
+                //timestamps.Add(0);
+                return;
+            }
+
+            timestamps.Add(note.timestamp);
+            foreach (NoteHistory history in note.contentHistory)
+            {
+                timestamps.Add(history.timestamp);
+            }
+        }
+
 
         public static int MinTitleLength = 4;
         public static int MinContentLength = 8;

@@ -72,7 +72,10 @@ namespace GBG.ProjectNotes.Editor
                           "可以在这里输入一些信息，然后将此资产上传到版本控制系统，来在团队中分享信息。\r\n\r\n" +
                           "The information content supports <color=green>rich text</color>, see reference:\r\n" +
                           "信息内容支持<color=green>富文本</color>，参考：\r\n\r\n" +
-                          "    <i>https://docs.unity3d.com/Manual/UIE-supported-tags.html</i>.",
+                          "    <i>https://docs.unity3d.com/Manual/UIE-supported-tags.html</i>",
+                contentHistory = {
+                    new NoteHistory(0, "This is a <color=blue>historical version</color> sample.\r\n这是一个<color=blue>历史版本</color>示例。")
+                },
             }
         };
 

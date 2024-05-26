@@ -39,11 +39,6 @@ namespace GBG.ProjectNotes.Editor
             content = newContent;
         }
 
-        public string GetDateTimeString()
-        {
-            return new DateTime(timestamp).ToString(Utility.DateTimeFormat);
-        }
-
         public NoteKey GetKey()
         {
             return new NoteKey(guid, timestamp);
