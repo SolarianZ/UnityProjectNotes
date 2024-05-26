@@ -313,8 +313,7 @@ namespace GBG.ProjectNotes.Editor
 
         private void AddNewNote()
         {
-            // TODO : AddNewNote
-            Debug.LogError("TODO: Add New Note");
+            NoteEditWindow.Open(null, OnSubmitNoteEntry);
         }
 
 

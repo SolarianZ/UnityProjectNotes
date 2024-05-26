@@ -90,6 +90,12 @@ namespace GBG.ProjectNotes.Editor
         }
 
 
+        private void OnSubmitNoteEntry(NoteEntry note)
+        {
+            Debug.LogError($"TODO: OnSubmitNoteEntry: {note}");
+        }
+
+
         #region Context Menu
 
         void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
