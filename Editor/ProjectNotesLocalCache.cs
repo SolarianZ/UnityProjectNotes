@@ -78,6 +78,12 @@ namespace GBG.ProjectNotes.Editor
 
         public void RemoveInvalidGuids(IEnumerable<NoteEntry> notes)
         {
+            if (notes == null)
+            {
+                _readNoteKeys.Clear();
+                return;
+            }
+
             for (int i = _readNoteKeys.Count - 1; i >= 0; i--)
             {
                 bool invalid = true;

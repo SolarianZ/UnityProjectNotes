@@ -6,6 +6,7 @@ namespace GBG.ProjectNotes.Editor
 {
     public class NoteListViewItemLabel : Label
     {
+        public NoteEntry Note { get; private set; }
         private Image _redDotIcon;
 
         public bool redDotIconVisible
@@ -18,7 +19,7 @@ namespace GBG.ProjectNotes.Editor
             }
             set
             {
-                if (visible)
+                if (value)
                 {
                     if (_redDotIcon == null)
                     {
@@ -40,16 +41,13 @@ namespace GBG.ProjectNotes.Editor
             style.paddingLeft = 4;
             style.paddingRight = 4;
             style.unityTextAlign = TextAnchor.MiddleLeft;
-
-            CreateRedDotIcon();
         }
 
         private void CreateRedDotIcon()
         {
             _redDotIcon = new Image
             {
-                //image = EditorGUIUtility.Load("winbtn_mac_close") as Texture,
-                image = EditorGUIUtility.Load("redLight") as Texture,
+                image = EditorGUIUtility.Load(Utility.RedDotIconName) as Texture,
                 style =
                 {
                     alignSelf = Align.FlexEnd,
@@ -61,10 +59,31 @@ namespace GBG.ProjectNotes.Editor
             Add(_redDotIcon);
         }
 
-        public void SetupView(string title, bool unread)
+        public void Bind(NoteEntry note)
         {
-            text = title;
-            redDotIconVisible = unread;
+            Note = note;
+            UpdateView();
+        }
+
+        public void Unbind()
+        {
+            Note = null;
+            UpdateView();
+        }
+
+        public void UpdateView()
+        {
+            if (Note == null)
+            {
+                text = null;
+                redDotIconVisible = false;
+            }
+            else
+            {
+                text = Note.title;
+                bool unread = !ProjectNotesLocalCache.instance.IsRead(Note.GetKey());
+                redDotIconVisible = unread;
+            }
         }
 
 

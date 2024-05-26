@@ -9,7 +9,7 @@ namespace GBG.ProjectNotes.Editor
         private readonly List<Toggle> _toggles = new List<Toggle>();
         private Toggle _activeToggle;
 
-        public event Action<Toggle> ActiveToggleChanged;
+        public event Action<Toggle> activeToggleChanged;
 
 
         public new void Add(VisualElement child)
@@ -56,7 +56,7 @@ namespace GBG.ProjectNotes.Editor
                 }
             }
 
-            ActiveToggleChanged?.Invoke(_activeToggle);
+            activeToggleChanged?.Invoke(_activeToggle);
         }
     }
 }

@@ -64,7 +64,7 @@ namespace GBG.ProjectNotes.Editor
             titleContent.text = "Project Notes";
             minSize = new Vector2(200, 200);
 
-            _selectedCategoryChanged = true;
+            LocalCache.RemoveInvalidGuids(Settings?.Notes);
             _filteredNotes.Clear();
         }
 

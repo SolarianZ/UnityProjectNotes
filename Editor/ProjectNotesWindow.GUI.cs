@@ -50,8 +50,7 @@ namespace GBG.ProjectNotes.Editor
             _toolbarEntryRedDotIconVisible = false;
             _toolbarEntryRedDotIcon = new Image
             {
-                //image = EditorGUIUtility.Load("winbtn_mac_close") as Texture,
-                image = EditorGUIUtility.Load("redLight") as Texture,
+                image = EditorGUIUtility.Load(Utility.RedDotIconName) as Texture,
                 style =
                 {
                     marginTop = 1,
@@ -198,6 +197,7 @@ namespace GBG.ProjectNotes.Editor
                     flexGrow = 1,
                 }
             };
+            _categoryGroup.activeToggleChanged += UpdateSelecteeCategory;
             categoryContainer.Add(_categoryGroup);
 
             #endregion
@@ -219,6 +219,7 @@ namespace GBG.ProjectNotes.Editor
                 fixedItemHeight = 24,
                 makeItem = NoteListViewItemLabel.MakeItem,
                 bindItem = BindNoteListItemView,
+                unbindItem = UnbindNoteListItemView,
                 reorderable = false,
                 selectionType = SelectionType.Single,
             };
@@ -235,6 +236,7 @@ namespace GBG.ProjectNotes.Editor
             #region Note Content
 
             _contentView = new NoteContentView();
+            _contentView.readStatusChanged += OnNoteReadStatusChanged;
             noteContainer.Add(_contentView);
 
             #endregion
@@ -264,15 +266,24 @@ namespace GBG.ProjectNotes.Editor
             UpdateNodeContentView();
         }
 
+        private void OnNoteReadStatusChanged(NoteEntry changedNote)
+        {
+            NoteEntry selectedNote = (NoteEntry)_noteEntryListView.selectedItem;
+            if (selectedNote == changedNote)
+            {
+                _noteEntryListView.RefreshItem(_noteEntryListView.selectedIndex);
+                return;
+            }
+
+            _noteEntryListView.Rebuild();
+        }
+
 
         #region Category
 
-        private bool _selectedCategoryChanged = true;
-
-
         private void UpdateCategories()
         {
-            if (_categoryGroup == null || !_selectedCategoryChanged)
+            if (_categoryGroup == null)
             {
                 return;
             }
@@ -299,8 +310,13 @@ namespace GBG.ProjectNotes.Editor
                     ((CategoryEntryToggle)_categoryGroup[0]).SetValueWithoutNotify(true);
                 }
             }
+        }
 
-            _selectedCategoryChanged = false;
+        private void UpdateSelecteeCategory(Toggle toggle)
+        {
+            string category = toggle.text;
+            LocalCache.SelectedCategory = category;
+            UpdateFilteredNoteList();
         }
 
         #endregion
@@ -310,9 +326,15 @@ namespace GBG.ProjectNotes.Editor
 
         public void BindNoteListItemView(VisualElement element, int index)
         {
-            NoteListViewItemLabel itemView = (NoteListViewItemLabel)element;
-            NoteEntry noteItem = Settings.Notes[index];
-            itemView.SetupView(noteItem.title, !LocalCache.IsRead(noteItem.GetKey()));
+            NoteListViewItemLabel listItem = (NoteListViewItemLabel)element;
+            NoteEntry note = _filteredNotes[index];
+            listItem.Bind(note);
+        }
+
+        private void UnbindNoteListItemView(VisualElement element, int arg2)
+        {
+            NoteListViewItemLabel listItem = (NoteListViewItemLabel)element;
+            listItem.Unbind();
         }
 
         private void OnNoteEntryListSelectionChanged(IEnumerable<object> enumerable)

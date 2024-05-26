@@ -19,7 +19,7 @@ namespace GBG.ProjectNotes.Editor
             }
             set
             {
-                if (visible)
+                if (value)
                 {
                     if (_redDotIcon == null)
                     {
@@ -39,15 +39,13 @@ namespace GBG.ProjectNotes.Editor
         public CategoryEntryToggle(string text = null)
         {
             this.text = text;
-            CreateRedDotIcon();
         }
 
         private void CreateRedDotIcon()
         {
             _redDotIcon = new Image
             {
-                //image = EditorGUIUtility.Load("winbtn_mac_close") as Texture,
-                image = EditorGUIUtility.Load("redLight") as Texture,
+                image = EditorGUIUtility.Load(Utility.RedDotIconName) as Texture,
                 style =
                 {
                     width = 8,

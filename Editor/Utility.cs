@@ -36,5 +36,8 @@ namespace GBG.ProjectNotes.Editor
             alert = null;
             return true;
         }
+
+
+        public const string RedDotIconName = "redLight"; // "winbtn_mac_close"
     }
 }
