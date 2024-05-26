@@ -107,6 +107,7 @@ namespace GBG.ProjectNotes.Editor
             }
             else if (!hasUnreadNotes && _toolbarEntryRedDotIconVisible)
             {
+                _toolbarEntryRedDotIconVisible = false;
                 _toolbarEntryRedDotIcon.style.display = DisplayStyle.None;
             }
         }
