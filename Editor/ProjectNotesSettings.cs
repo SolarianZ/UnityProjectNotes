@@ -74,7 +74,7 @@ namespace GBG.ProjectNotes.Editor
                           "信息内容支持<color=green>富文本</color>，参考：\r\n\r\n" +
                           "    <i>https://docs.unity3d.com/Manual/UIE-supported-tags.html</i>",
                 contentHistory = {
-                    new NoteHistory(0, "This is a <color=blue>historical version</color> sample.\r\n这是一个<color=blue>历史版本</color>示例。")
+                    new NoteHistory(638523129278317086, "This is a <color=blue>historical version</color> sample.\r\n这是一个<color=blue>历史版本</color>示例。")
                 },
             }
         };
