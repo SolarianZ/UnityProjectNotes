@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace GBG.ProjectNotes.Editor
@@ -58,6 +59,11 @@ namespace GBG.ProjectNotes.Editor
             {
                 text = "-",
                 enableRichText = true,
+                style =
+                {
+                    fontSize = 11,
+                    unityFontStyleAndWeight = FontStyle.Italic,
+                }
             };
 #if UNITY_2022_3_OR_NEWER
             ((ITextSelection)_authorLabel).isSelectable = true;
@@ -69,7 +75,7 @@ namespace GBG.ProjectNotes.Editor
                 style =
                 {
                     flexGrow = 1,
-                    marginTop = 4,
+                    marginTop = 10,
                 }
             };
             Add(contentScrollView);
@@ -105,9 +111,9 @@ namespace GBG.ProjectNotes.Editor
         public void SetNote(NoteEntry note)
         {
             _note = note;
-            _titleLabel.text = _note?.title ?? "-";
-            _authorLabel.text = _note?.author ?? "-";
-            _contentLabel.text = _note?.content ?? "-";
+            _titleLabel.text = _note?.title ?? "TITLE";
+            _authorLabel.text = _note == null ? "AUTHOR" : $"by {_note.author}";
+            _contentLabel.text = _note?.content ?? "CONTENT";
             UpdateMarkButtonText();
             _markButton.SetEnabled(_note != null);
         }
@@ -120,7 +126,7 @@ namespace GBG.ProjectNotes.Editor
         private void UpdateMarkButtonText()
         {
             _markButton.text = _note == null
-                ? "-"
+                ? "MARK"
                 : ProjectNotesLocalCache.instance.IsRead(_note.GetKey())
                     ? "Mark as Unread"
                     : "Mark as Read";

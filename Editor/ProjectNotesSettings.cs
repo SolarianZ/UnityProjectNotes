@@ -60,7 +60,21 @@ namespace GBG.ProjectNotes.Editor
         [SerializeField]
         private long _versionTimestamp = Utility.NewTimestamp();
         [SerializeField]
-        private List<NoteEntry> _notes = new List<NoteEntry>();
+        private List<NoteEntry> _notes = new List<NoteEntry>
+        {
+            new NoteEntry
+            {
+                category = "Sample",
+                author = "ZQY",
+                title = "Notes Sample / 信息示例",
+                content = "This is a <b>sample note.</b>\r\n这是一个<b>示例信息。</b>\r\n\r\n" +
+                          "You can enter some information here and then upload this asset to a version control system to share the information within the team.\r\n" +
+                          "可以在这里输入一些信息，然后将此资产上传到版本控制系统，来在团队中分享信息。\r\n\r\n" +
+                          "The information content supports <color=green>rich text</color>, see reference:\r\n" +
+                          "信息内容支持<color=green>富文本</color>，参考：\r\n\r\n" +
+                          "    <i>https://docs.unity3d.com/Manual/UIE-supported-tags.html</i>.",
+            }
+        };
 
 
         public List<string> CollectCategories(bool addCategoryAll = true)
