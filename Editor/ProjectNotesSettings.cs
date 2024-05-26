@@ -66,7 +66,7 @@ namespace GBG.ProjectNotes.Editor
             {
                 category = "Sample",
                 author = "ZQY",
-                title = "Notes Sample / 信息示例",
+                title = "Sample Note / 示例信息",
                 content = "This is a <b>sample note.</b>\r\n这是一个<b>示例信息。</b>\r\n\r\n" +
                           "You can enter some information here and then upload this asset to a version control system to share the information within the team.\r\n" +
                           "可以在这里输入一些信息，然后将此资产上传到版本控制系统，来在团队中分享信息。\r\n\r\n" +

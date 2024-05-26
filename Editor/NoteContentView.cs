@@ -9,6 +9,13 @@ namespace GBG.ProjectNotes.Editor
 {
     public class NoteContentView : VisualElement
     {
+        public static Color draftLabelBorderColor = new Color32(255, 180, 0, 255);
+        public static Color unreadLabelBorderColor = new Color32(240, 0, 0, 255);
+        public static float statusLabelBorderWidth = 2;
+        public static float statusLabelBorderRadius = 4;
+
+        private readonly Label _versionLabel;
+        private readonly Label _unreadLabel;
         private readonly Label _titleLabel;
         private readonly Label _authorLabel;
         private readonly PopupField<long> _historyPopup;
@@ -26,6 +33,67 @@ namespace GBG.ProjectNotes.Editor
             style.paddingRight = 4;
             style.paddingTop = 4;
             style.paddingBottom = 4;
+
+            VisualElement statusContainer = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                }
+            };
+            Add(statusContainer);
+
+            _versionLabel = new Label
+            {
+                text = "Draft",
+                style =
+                {
+                    display = DisplayStyle.None,
+                    marginRight = 2,
+                    paddingLeft= 2,
+                    paddingRight= 2,
+                    borderLeftWidth = statusLabelBorderWidth,
+                    borderRightWidth = statusLabelBorderWidth,
+                    borderTopWidth = statusLabelBorderWidth,
+                    borderBottomWidth = statusLabelBorderWidth,
+                    borderTopLeftRadius = statusLabelBorderRadius ,
+                    borderTopRightRadius = statusLabelBorderRadius ,
+                    borderBottomLeftRadius = statusLabelBorderRadius ,
+                    borderBottomRightRadius = statusLabelBorderRadius ,
+                    borderLeftColor = draftLabelBorderColor,
+                    borderRightColor = draftLabelBorderColor,
+                    borderTopColor = draftLabelBorderColor,
+                    borderBottomColor = draftLabelBorderColor,
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                }
+            };
+            statusContainer.Add(_versionLabel);
+
+            _unreadLabel = new Label
+            {
+                text = "Unread",
+                style =
+                {
+                    display = DisplayStyle.None,
+                    marginLeft = 2,
+                    paddingLeft= 2,
+                    paddingRight= 2,
+                    borderLeftWidth = statusLabelBorderWidth,
+                    borderRightWidth = statusLabelBorderWidth,
+                    borderTopWidth = statusLabelBorderWidth,
+                    borderBottomWidth = statusLabelBorderWidth,
+                    borderTopLeftRadius = statusLabelBorderRadius,
+                    borderTopRightRadius = statusLabelBorderRadius,
+                    borderBottomLeftRadius = statusLabelBorderRadius,
+                    borderBottomRightRadius = statusLabelBorderRadius,
+                    borderLeftColor = unreadLabelBorderColor,
+                    borderRightColor = unreadLabelBorderColor,
+                    borderTopColor = unreadLabelBorderColor,
+                    borderBottomColor = unreadLabelBorderColor,
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                }
+            };
+            statusContainer.Add(_unreadLabel);
 
             _titleLabel = new Label
             {
@@ -117,10 +185,19 @@ namespace GBG.ProjectNotes.Editor
         public void SetNote(NoteEntry note)
         {
             _note = note;
+            _versionLabel.text = _note?.isDraft ?? false
+                ? "Draft"
+                : null;
+            _versionLabel.style.display = _note?.isDraft ?? false
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            _unreadLabel.style.display = _note != null && !ProjectNotesLocalCache.instance.IsRead(_note.GetKey())
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
             _titleLabel.text = _note?.title ?? "TITLE";
             _authorLabel.text = _note == null ? "AUTHOR" : $"by {_note.author}";
             Utility.CollectHistoryTimestamps(_note, _historyTimestamps);
-            _historyPopup.value = _note?.timestamp ?? 0L;
+            _historyPopup.SetValueWithoutNotify(_note?.timestamp ?? 0L);
             _contentLabel.text = _note?.content ?? "CONTENT";
             UpdateMarkButton();
         }
@@ -135,8 +212,7 @@ namespace GBG.ProjectNotes.Editor
             long timestamp = evt.newValue;
             if (timestamp == _note.timestamp)
             {
-                _contentLabel.text = _note.content;
-                UpdateMarkButton();
+                RefreshView();
                 return;
             }
 
@@ -144,6 +220,9 @@ namespace GBG.ProjectNotes.Editor
             {
                 if (history.timestamp == timestamp)
                 {
+                    _versionLabel.text = "Old Version";
+                    _versionLabel.style.display = DisplayStyle.Flex;
+                    _unreadLabel.style.display = DisplayStyle.None;
                     _contentLabel.text = history.content;
                     UpdateMarkButton();
                     return;
@@ -151,7 +230,7 @@ namespace GBG.ProjectNotes.Editor
             }
 
             UDebug.LogError($"Unable to find historical version for timestamp '{timestamp}'.");
-            _historyPopup.index = 0;
+            RefreshView();
         }
 
         private void UpdateMarkButton()
@@ -181,7 +260,7 @@ namespace GBG.ProjectNotes.Editor
                 ProjectNotesLocalCache.instance.MarkAsRead(_note.GetKey());
             }
 
-            UpdateMarkButton();
+            RefreshView();
 
             readStatusChanged?.Invoke(_note);
         }

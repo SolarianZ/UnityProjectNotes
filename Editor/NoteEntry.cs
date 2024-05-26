@@ -13,13 +13,13 @@ namespace GBG.ProjectNotes.Editor
         public long timestamp = Utility.NewTimestamp();
         public string category;
         public string author;
+        public bool isDraft;
         //[HideInInspector]
         //public string password;
         public string title;
         [TextArea(3, 20)]
         public string content;
         public List<NoteHistory> contentHistory = new List<NoteHistory>();
-        // TODO: public bool isDraft;
 
 
         // Allow to clear remote read status
