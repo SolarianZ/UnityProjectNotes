@@ -128,8 +128,9 @@ namespace GBG.ProjectNotes.Editor
         private bool _createSettingsButtonVisible;
         private Button _createSettingsButton;
         private VisualElement _mainViewContainer;
+        private EditorToggleGroup _categoryGroup;
         private ListView _noteEntryListView;
-        private ProjectNoteContentView _contentView;
+        private NoteContentView _contentView;
 
 
 #pragma warning disable IDE0051 // Remove unused private members
@@ -187,7 +188,7 @@ namespace GBG.ProjectNotes.Editor
             };
             _mainViewContainer.Add(categoryContainer);
 
-            EditorToggleGroup categoryGroup = new EditorToggleGroup
+            _categoryGroup = new EditorToggleGroup
             {
                 name = "CategoryGroup",
                 style =
@@ -197,14 +198,7 @@ namespace GBG.ProjectNotes.Editor
                     flexGrow = 1,
                 }
             };
-            categoryContainer.Add(categoryGroup);
-
-            categoryGroup.Add(new CategoryItemToggle { text = "A111111111111" });
-            categoryGroup.Add(new CategoryItemToggle { text = "B111111111111" });
-            categoryGroup.Add(new CategoryItemToggle { text = "C111111111111" });
-            categoryGroup.Add(new CategoryItemToggle { text = "D111111111111" });
-            categoryGroup.Add(new CategoryItemToggle { text = "E111111111111" });
-            categoryGroup.Add(new CategoryItemToggle { text = "F111111111111" });
+            categoryContainer.Add(_categoryGroup);
 
             #endregion
 
@@ -223,7 +217,7 @@ namespace GBG.ProjectNotes.Editor
             {
                 itemsSource = _filteredNotes,
                 fixedItemHeight = 24,
-                makeItem = ProjectNoteListItemLabel.MakeItem,
+                makeItem = NoteListViewItemLabel.MakeItem,
                 bindItem = BindNoteListItemView,
                 reorderable = false,
                 selectionType = SelectionType.Single,
@@ -240,7 +234,7 @@ namespace GBG.ProjectNotes.Editor
 
             #region Note Content
 
-            _contentView = new ProjectNoteContentView();
+            _contentView = new NoteContentView();
             noteContainer.Add(_contentView);
 
             #endregion
@@ -261,19 +255,65 @@ namespace GBG.ProjectNotes.Editor
         }
 
 
+        #region Category
+
+        private bool _selectedCategoryChanged = true;
+
+
+        private void UpdateCategories()
+        {
+            if (_categoryGroup == null || !_selectedCategoryChanged)
+            {
+                return;
+            }
+
+            _categoryGroup.Clear();
+            if (Settings)
+            {
+                bool selectedCategoryFound = false;
+                List<string> categories = Settings.CollectCategories();
+                foreach (string category in categories)
+                {
+                    CategoryEntryToggle entry = new CategoryEntryToggle(category);
+                    if (category == LocalCache.SelectedCategory)
+                    {
+                        selectedCategoryFound = true;
+                        entry.SetValueWithoutNotify(true);
+                    }
+                    _categoryGroup.Add(entry);
+                }
+
+                if (!selectedCategoryFound)
+                {
+                    LocalCache.SelectedCategory = ProjectNotesSettings.CategoryAll;
+                    ((CategoryEntryToggle)_categoryGroup[0]).SetValueWithoutNotify(true);
+                }
+            }
+
+            _selectedCategoryChanged = false;
+        }
+
+        #endregion
+
+
         #region Note List View
 
         public void BindNoteListItemView(VisualElement element, int index)
         {
-            ProjectNoteListItemLabel itemView = (ProjectNoteListItemLabel)element;
-            ProjectNoteItem noteItem = Settings.Notes[index];
-            itemView.SetupView(noteItem.title, !LocalCache.IsRead(noteItem.guid));
+            NoteListViewItemLabel itemView = (NoteListViewItemLabel)element;
+            NoteEntry noteItem = Settings.Notes[index];
+            itemView.SetupView(noteItem.title, !LocalCache.IsRead(noteItem.GetKey()));
         }
 
         private void OnNoteEntryListSelectionChanged(IEnumerable<object> enumerable)
         {
-            ProjectNoteItem note = (ProjectNoteItem)_noteEntryListView.selectedItem;
+            NoteEntry note = (NoteEntry)_noteEntryListView.selectedItem;
             _contentView.SetNote(note);
+        }
+
+        private void UpdateFilteredNoteList()
+        {
+            // TODO
         }
 
         #endregion

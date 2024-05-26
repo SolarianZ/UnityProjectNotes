@@ -3,17 +3,17 @@ using UnityEngine.UIElements;
 
 namespace GBG.ProjectNotes.Editor
 {
-    public class ProjectNoteContentView : VisualElement
+    public class NoteContentView : VisualElement
     {
         private readonly Label _titleLabel;
         private readonly Label _authorLabel;
         private readonly Label _contentLabel;
-        private ProjectNoteItem _note;
+        private NoteEntry _note;
 
-        public event Action<ProjectNoteItem> readStatusChanged;
+        public event Action<NoteEntry> readStatusChanged;
 
 
-        public ProjectNoteContentView()
+        public NoteContentView()
         {
             style.paddingLeft = 8;
             style.paddingRight = 4;
@@ -101,7 +101,7 @@ namespace GBG.ProjectNotes.Editor
             Add(markButton);
         }
 
-        public void SetNote(ProjectNoteItem note)
+        public void SetNote(NoteEntry note)
         {
             _note = note;
             _titleLabel.text = _note?.title ?? "-";
@@ -116,14 +116,14 @@ namespace GBG.ProjectNotes.Editor
                 return;
             }
 
-            bool read = ProjectNotesLocalCache.instance.IsRead(_note.guid);
+            bool read = ProjectNotesLocalCache.instance.IsRead(_note.GetKey());
             if (read)
             {
-                ProjectNotesLocalCache.instance.MarkAsUnread(_note.guid);
+                ProjectNotesLocalCache.instance.MarkAsUnread(_note.GetKey());
             }
             else
             {
-                ProjectNotesLocalCache.instance.MarkAsRead(_note.guid);
+                ProjectNotesLocalCache.instance.MarkAsRead(_note.GetKey());
             }
 
             readStatusChanged?.Invoke(_note);

@@ -8,15 +8,38 @@ namespace GBG.ProjectNotes.Editor
         FilePathAttribute.Location.ProjectFolder)]
     internal class ProjectNotesLocalCache : ScriptableSingleton<ProjectNotesLocalCache>
     {
+        #region Category
+
         [SerializeField]
-        private List<long> _readNoteGuids = new List<long>();
+        private string _selectedCategory;
 
-
-        public bool HasUnreadNotes(IEnumerable<ProjectNoteItem> notes)
+        public string SelectedCategory
         {
-            foreach (ProjectNoteItem note in notes)
+            get => _selectedCategory;
+            set
             {
-                if (!IsRead(note.guid))
+                if (_selectedCategory != value)
+                {
+                    _selectedCategory = value;
+                    ForceSave();
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region Note Status
+
+        [SerializeField]
+        private List<NoteKey> _readNoteKeys = new List<NoteKey>();
+
+
+        public bool HasUnreadNotes(IEnumerable<NoteEntry> notes)
+        {
+            foreach (NoteEntry note in notes)
+            {
+                if (!IsRead(note.GetKey()))
                 {
                     return true;
                 }
@@ -25,23 +48,23 @@ namespace GBG.ProjectNotes.Editor
             return false;
         }
 
-        public bool IsRead(long guid)
+        public bool IsRead(NoteKey key)
         {
-            return _readNoteGuids.Contains(guid);
+            return _readNoteKeys.Contains(key);
         }
 
-        public void MarkAsRead(long guid)
+        public void MarkAsRead(NoteKey key)
         {
-            if (!_readNoteGuids.Contains(guid))
+            if (!_readNoteKeys.Contains(key))
             {
-                _readNoteGuids.Add(guid);
+                _readNoteKeys.Add(key);
                 Save(true);
             }
         }
 
-        public void MarkAsUnread(long guid)
+        public void MarkAsUnread(NoteKey key)
         {
-            if (_readNoteGuids.Remove(guid))
+            if (_readNoteKeys.Remove(key))
             {
                 Save(true);
             }
@@ -49,18 +72,18 @@ namespace GBG.ProjectNotes.Editor
 
         public void ClearReadNotes()
         {
-            _readNoteGuids.Clear();
+            _readNoteKeys.Clear();
             Save(true);
         }
 
-        public void RemoveInvalidGuids(IEnumerable<ProjectNoteItem> notes)
+        public void RemoveInvalidGuids(IEnumerable<NoteEntry> notes)
         {
-            for (int i = _readNoteGuids.Count - 1; i >= 0; i--)
+            for (int i = _readNoteKeys.Count - 1; i >= 0; i--)
             {
                 bool invalid = true;
-                foreach (ProjectNoteItem note in notes)
+                foreach (NoteEntry note in notes)
                 {
-                    if (note.guid == _readNoteGuids[i])
+                    if (note.GetKey() == _readNoteKeys[i])
                     {
                         invalid = false;
                         break;
@@ -69,12 +92,15 @@ namespace GBG.ProjectNotes.Editor
 
                 if (invalid)
                 {
-                    _readNoteGuids.RemoveAt(i);
+                    _readNoteKeys.RemoveAt(i);
                 }
             }
 
             Save(true);
         }
+
+        #endregion
+
 
         [ContextMenu("Force Save")]
         public void ForceSave()

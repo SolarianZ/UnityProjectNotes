@@ -55,8 +55,7 @@ namespace GBG.ProjectNotes.Editor
         #endregion
 
 
-        private List<string> _categories;
-        private readonly List<ProjectNoteItem> _filteredNotes = new List<ProjectNoteItem>();
+        private readonly List<NoteEntry> _filteredNotes = new List<NoteEntry>();
 
 
         private void OnEnable()
@@ -65,22 +64,16 @@ namespace GBG.ProjectNotes.Editor
             titleContent.text = "Project Notes";
             minSize = new Vector2(200, 200);
 
+            _selectedCategoryChanged = true;
             _filteredNotes.Clear();
-            if (Settings)
-            {
-                _categories = Settings.CollectCategories();
-                _filteredNotes.AddRange(Settings.Notes);
-            }
-            else
-            {
-                _categories = new List<string>(0);
-            }
         }
 
         private void OnFocus()
         {
             // TODO: refresh view, need check null!
             // TODO: update categories and filtered notes
+            UpdateCategories();
+            UpdateFilteredNoteList();
         }
 
         private void Update()
@@ -112,10 +105,6 @@ namespace GBG.ProjectNotes.Editor
             menu.AddSeparator("");
 
             // Debug
-            menu.AddItem(new GUIContent("[Debug] Generate New Guid to Clipboard"), false, () =>
-            {
-                GUIUtility.systemCopyBuffer = ProjectNoteUtility.NewGuid().ToString();
-            });
             menu.AddItem(new GUIContent("[Debug] Inspect Local Cache Asset"), false, () =>
             {
                 Selection.activeObject = LocalCache;

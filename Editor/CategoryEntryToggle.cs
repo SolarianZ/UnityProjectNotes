@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.ProjectNotes.Editor
 {
-    public class CategoryItemToggle : ToolbarToggle
+    public class CategoryEntryToggle : ToolbarToggle
     {
         private Image _redDotIcon;
 
@@ -36,8 +36,9 @@ namespace GBG.ProjectNotes.Editor
         }
 
 
-        public CategoryItemToggle()
+        public CategoryEntryToggle(string text = null)
         {
+            this.text = text;
             CreateRedDotIcon();
         }
 

@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.ProjectNotes.Editor
 {
-    public class ProjectNoteListItemLabel : Label
+    public class NoteListViewItemLabel : Label
     {
         private Image _redDotIcon;
 
@@ -35,7 +35,7 @@ namespace GBG.ProjectNotes.Editor
         }
 
 
-        public ProjectNoteListItemLabel()
+        public NoteListViewItemLabel()
         {
             style.paddingLeft = 4;
             style.paddingRight = 4;
@@ -70,7 +70,7 @@ namespace GBG.ProjectNotes.Editor
 
         public static VisualElement MakeItem()
         {
-            ProjectNoteListItemLabel itemView = new ProjectNoteListItemLabel();
+            NoteListViewItemLabel itemView = new NoteListViewItemLabel();
             return itemView;
         }
     }

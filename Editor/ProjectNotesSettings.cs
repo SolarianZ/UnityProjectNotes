@@ -55,19 +55,19 @@ namespace GBG.ProjectNotes.Editor
         #endregion
 
 
-        public long VersionGuid => _versionGuid;
-        public List<ProjectNoteItem> Notes => _notes;
+        public long VersionTimestamp => _versionTimestamp;
+        public List<NoteEntry> Notes => _notes;
 
         [SerializeField]
-        private long _versionGuid = ProjectNoteUtility.NewGuid();
+        private long _versionTimestamp = Utility.NewTimestamp();
         [SerializeField]
-        private List<ProjectNoteItem> _notes = new List<ProjectNoteItem>();
+        private List<NoteEntry> _notes = new List<NoteEntry>();
 
 
         public List<string> CollectCategories(bool addCategoryAll = true)
         {
             HashSet<string> categoriesHashSet = new HashSet<string>();
-            foreach (ProjectNoteItem note in _notes)
+            foreach (NoteEntry note in _notes)
             {
                 string category = note.category?.Trim();
                 if (string.IsNullOrEmpty(category))
@@ -92,14 +92,7 @@ namespace GBG.ProjectNotes.Editor
             return categories;
         }
 
-        [ContextMenu("[Debug] Generate New Version Guid")]
-        public void UpdateVersionGuid()
-        {
-            _versionGuid = ProjectNoteUtility.NewGuid();
-            ForceSave();
-        }
-
-        [ContextMenu("Force Save")]
+        [ContextMenu("Force Save", false, 0)]
         internal void ForceSave()
         {
             EditorUtility.SetDirty(this);
@@ -109,6 +102,18 @@ namespace GBG.ProjectNotes.Editor
             AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(this));
 #endif
             AssetDatabase.SaveAssetIfDirty(this);
+        }
+
+        [ContextMenu("[Debug] Generate New Guid to Clipboard", false, 100)]
+        public void GenerateNewGuidToClipboard()
+        {
+            GUIUtility.systemCopyBuffer = Utility.NewGuid();
+        }
+
+        [ContextMenu("[Debug] Generate New Timestamp to Clipboard", false, 101)]
+        public void GenerateNewTimestampToClipboard()
+        {
+            GUIUtility.systemCopyBuffer = Utility.NewTimestamp().ToString();
         }
     }
 }
