@@ -286,13 +286,27 @@ namespace GBG.ProjectNotes.Editor
 
         private void OnNoteReadStatusChanged(NoteEntry changedNote)
         {
+            // Note Category
+            foreach (VisualElement child in _categoryGroup.Children())
+            {
+                CategoryEntryToggle entryToggle = (CategoryEntryToggle)child;
+                if (entryToggle.text == changedNote.GetTrimmedCategory())
+                {
+                    entryToggle.redDotIconVisible = Utility.HasUnreadNotesInCategory(entryToggle.text);
+                }
+                else if (entryToggle.text == ProjectNotesSettings.CategoryAll)
+                {
+                    entryToggle.redDotIconVisible = Utility.HasUnreadNotesInCategory(ProjectNotesSettings.CategoryAll);
+                }
+            }
+
+            // Note Entry List View
             NoteEntry selectedNote = (NoteEntry)_noteEntryListView.selectedItem;
             if (selectedNote == changedNote)
             {
                 _noteEntryListView.RefreshItem(_noteEntryListView.selectedIndex);
                 return;
             }
-
             _noteEntryListView.Rebuild();
         }
 
@@ -345,6 +359,14 @@ namespace GBG.ProjectNotes.Editor
             string category = toggle.text;
             LocalCache.SelectedCategory = category;
             UpdateFilteredNoteList();
+            if (_filteredNotes.Count > 0)
+            {
+                _noteEntryListView.selectedIndex = 0;
+            }
+            else
+            {
+                _noteEntryListView.ClearSelection();
+            }
         }
 
         #endregion

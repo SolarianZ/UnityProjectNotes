@@ -46,7 +46,7 @@ namespace GBG.ProjectNotes.Editor
             {
                 foreach (NoteEntry note in settings.Notes)
                 {
-                    if (!ProjectNotesLocalCache.instance.IsRead(note.GetKey()))
+                    if (ProjectNotesLocalCache.instance.IsUnread(note.GetKey()))
                     {
                         return true;
                     }
@@ -56,7 +56,7 @@ namespace GBG.ProjectNotes.Editor
             foreach (NoteEntry note in settings.Notes)
             {
                 if (note.GetTrimmedCategory() == category &&
-                    !ProjectNotesLocalCache.instance.IsRead(note.GetKey()))
+                    ProjectNotesLocalCache.instance.IsUnread(note.GetKey()))
                 {
                     return true;
                 }

@@ -39,7 +39,7 @@ namespace GBG.ProjectNotes.Editor
         {
             foreach (NoteEntry note in notes)
             {
-                if (!IsRead(note.GetKey()))
+                if (IsUnread(note.GetKey()))
                 {
                     return true;
                 }
@@ -48,9 +48,10 @@ namespace GBG.ProjectNotes.Editor
             return false;
         }
 
-        public bool IsRead(NoteKey key)
+        public bool IsUnread(NoteKey key)
         {
-            return _readNoteKeys.Contains(key);
+            bool isUnread = !_readNoteKeys.Contains(key);
+            return isUnread;
         }
 
         public void MarkAsRead(NoteKey key)

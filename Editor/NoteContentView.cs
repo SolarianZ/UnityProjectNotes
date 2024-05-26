@@ -208,7 +208,7 @@ namespace GBG.ProjectNotes.Editor
             _versionLabel.style.display = _note?.isDraft ?? false
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
-            _unreadLabel.style.display = _note != null && !ProjectNotesLocalCache.instance.IsRead(_note.GetKey())
+            _unreadLabel.style.display = _note != null && ProjectNotesLocalCache.instance.IsUnread(_note.GetKey())
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
             _titleLabel.text = _note?.title ?? "TITLE";
@@ -254,9 +254,9 @@ namespace GBG.ProjectNotes.Editor
         {
             _markButton.text = _note == null || _note.timestamp != _historyPopup.value
                 ? "MARK"
-                : ProjectNotesLocalCache.instance.IsRead(_note.GetKey())
-                    ? "Mark as Unread"
-                    : "Mark as Read";
+                : ProjectNotesLocalCache.instance.IsUnread(_note.GetKey())
+                    ? "Mark as Read"
+                    : "Mark as Unread";
             _markButton.SetEnabled(_note != null && _note.timestamp == _historyPopup.value);
         }
 
@@ -267,14 +267,14 @@ namespace GBG.ProjectNotes.Editor
                 return;
             }
 
-            bool read = ProjectNotesLocalCache.instance.IsRead(_note.GetKey());
-            if (read)
+            bool unread = ProjectNotesLocalCache.instance.IsUnread(_note.GetKey());
+            if (unread)
             {
-                ProjectNotesLocalCache.instance.MarkAsUnread(_note.GetKey());
+                ProjectNotesLocalCache.instance.MarkAsRead(_note.GetKey());
             }
             else
             {
-                ProjectNotesLocalCache.instance.MarkAsRead(_note.GetKey());
+                ProjectNotesLocalCache.instance.MarkAsUnread(_note.GetKey());
             }
 
             RefreshView();

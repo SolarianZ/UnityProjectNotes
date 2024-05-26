@@ -81,7 +81,7 @@ namespace GBG.ProjectNotes.Editor
             else
             {
                 text = Note.title;
-                bool unread = !ProjectNotesLocalCache.instance.IsRead(Note.GetKey());
+                bool unread = ProjectNotesLocalCache.instance.IsUnread(Note.GetKey());
                 redDotIconVisible = unread;
             }
         }

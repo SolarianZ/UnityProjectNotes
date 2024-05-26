@@ -114,12 +114,12 @@ namespace GBG.ProjectNotes.Editor
                 {
                     if (!hasUnreadNotes && addCategoryAll)
                     {
-                        hasUnreadNotes = !ProjectNotesLocalCache.instance.IsRead(note.GetKey());
+                        hasUnreadNotes = ProjectNotesLocalCache.instance.IsUnread(note.GetKey());
                     }
                     continue;
                 }
 
-                if (!ProjectNotesLocalCache.instance.IsRead(note.GetKey()))
+                if (ProjectNotesLocalCache.instance.IsUnread(note.GetKey()))
                 {
                     hasUnreadNotes = true;
                     unreadCategoriesHashSet.Add(category);
