@@ -85,13 +85,8 @@ namespace GBG.ProjectNotes.Editor
             HashSet<string> categoriesHashSet = new HashSet<string>();
             foreach (NoteEntry note in _notes)
             {
-                string category = note.category?.Trim();
-                if (string.IsNullOrEmpty(category))
-                {
-                    continue;
-                }
-
-                if (category == CategoryAll)
+                string category = note.GetTrimmedCategory();
+                if (category == CategoryAll || string.IsNullOrEmpty(category))
                 {
                     continue;
                 }
@@ -105,6 +100,38 @@ namespace GBG.ProjectNotes.Editor
                 categories.Add(CategoryAll);
             }
             categories.AddRange(categoriesHashSet);
+            return categories;
+        }
+
+        public List<string> CollectCategoriesWithUnreadNotes(bool addCategoryAll = true)
+        {
+            HashSet<string> unreadCategoriesHashSet = new HashSet<string>();
+            bool hasUnreadNotes = false;
+            foreach (NoteEntry note in _notes)
+            {
+                string category = note.GetTrimmedCategory();
+                if (category == CategoryAll || string.IsNullOrEmpty(category))
+                {
+                    if (!hasUnreadNotes && addCategoryAll)
+                    {
+                        hasUnreadNotes = !ProjectNotesLocalCache.instance.IsRead(note.GetKey());
+                    }
+                    continue;
+                }
+
+                if (!ProjectNotesLocalCache.instance.IsRead(note.GetKey()))
+                {
+                    hasUnreadNotes = true;
+                    unreadCategoriesHashSet.Add(category);
+                }
+            }
+
+            List<string> categories = new List<string>(unreadCategoriesHashSet.Count + 1);
+            if (addCategoryAll && hasUnreadNotes)
+            {
+                categories.Add(CategoryAll);
+            }
+            categories.AddRange(unreadCategoriesHashSet);
             return categories;
         }
 

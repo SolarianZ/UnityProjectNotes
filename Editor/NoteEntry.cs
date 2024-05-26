@@ -39,6 +39,8 @@ namespace GBG.ProjectNotes.Editor
             content = newContent;
         }
 
+        public string GetTrimmedCategory() => category?.Trim();
+
         public NoteKey GetKey()
         {
             return new NoteKey(guid, timestamp);

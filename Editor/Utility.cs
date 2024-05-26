@@ -33,6 +33,38 @@ namespace GBG.ProjectNotes.Editor
             }
         }
 
+        public static bool HasUnreadNotesInCategory(string category)
+        {
+            ProjectNotesSettings settings = ProjectNotesSettings.instance;
+            if (!settings)
+            {
+                return false;
+            }
+
+            category = category?.Trim();
+            if (category == ProjectNotesSettings.CategoryAll)
+            {
+                foreach (NoteEntry note in settings.Notes)
+                {
+                    if (!ProjectNotesLocalCache.instance.IsRead(note.GetKey()))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            foreach (NoteEntry note in settings.Notes)
+            {
+                if (note.GetTrimmedCategory() == category &&
+                    !ProjectNotesLocalCache.instance.IsRead(note.GetKey()))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
 
         public static int MinTitleLength = 4;
         public static int MinContentLength = 8;

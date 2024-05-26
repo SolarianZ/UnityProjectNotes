@@ -197,7 +197,7 @@ namespace GBG.ProjectNotes.Editor
                     flexGrow = 1,
                 }
             };
-            _categoryGroup.activeToggleChanged += UpdateSelecteeCategory;
+            _categoryGroup.activeToggleChanged += UpdateSelectedCategory;
             categoryContainer.Add(_categoryGroup);
 
             Button newNoteButton = new Button(AddNewNote)
@@ -317,9 +317,13 @@ namespace GBG.ProjectNotes.Editor
             {
                 bool selectedCategoryFound = false;
                 List<string> categories = Settings.CollectCategories();
+                List<string> unreadCategories = Settings.CollectCategoriesWithUnreadNotes();
                 foreach (string category in categories)
                 {
-                    CategoryEntryToggle entry = new CategoryEntryToggle(category);
+                    CategoryEntryToggle entry = new CategoryEntryToggle(category)
+                    {
+                        redDotIconVisible = unreadCategories.Contains(category),
+                    };
                     if (category == LocalCache.SelectedCategory)
                     {
                         selectedCategoryFound = true;
@@ -336,7 +340,7 @@ namespace GBG.ProjectNotes.Editor
             }
         }
 
-        private void UpdateSelecteeCategory(Toggle toggle)
+        private void UpdateSelectedCategory(Toggle toggle)
         {
             string category = toggle.text;
             LocalCache.SelectedCategory = category;
@@ -378,7 +382,7 @@ namespace GBG.ProjectNotes.Editor
             foreach (NoteEntry note in Settings.Notes)
             {
                 if (LocalCache.SelectedCategory == ProjectNotesSettings.CategoryAll ||
-                    LocalCache.SelectedCategory == note.category)
+                    LocalCache.SelectedCategory == note.GetTrimmedCategory())
                 {
                     _filteredNotes.Add(note);
                 }
