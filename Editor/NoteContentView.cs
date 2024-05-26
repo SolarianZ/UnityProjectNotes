@@ -25,13 +25,14 @@ namespace GBG.ProjectNotes.Editor
         private readonly PopupField<long> _historyPopup;
         private readonly List<long> _historyTimestamps = new List<long>();
         private readonly Label _contentLabel;
+        private readonly VisualElement _opContainer;
         private readonly Button _markButton;
+        private readonly Button _opDropdownButton;
         private NoteEntry _note;
 
         public event Action<NoteEntry> readStatusChanged;
 
 
-        // TODO : Edit(Modify/Delete)
         public NoteContentView()
         {
             style.paddingLeft = 8;
@@ -182,6 +183,19 @@ namespace GBG.ProjectNotes.Editor
 #endif
             contentScrollView.Add(_contentLabel);
 
+            _opContainer = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    justifyContent = Justify.FlexEnd,
+                    minHeight= 28,
+                    maxHeight= 28,
+                    marginBottom = 4,
+                },
+            };
+            Add(_opContainer);
+
             _markButton = new Button(MarkStatus)
             {
                 text = "-",
@@ -189,14 +203,34 @@ namespace GBG.ProjectNotes.Editor
                 {
                     alignSelf = Align.FlexEnd,
                     width = 110,
-                    marginBottom = 5,
+                    marginRight = 0,
+                    paddingRight = 0,
                     borderTopLeftRadius = Utility.ButtonBorderRadius,
                     borderTopRightRadius = Utility.ButtonBorderRadius,
                     borderBottomLeftRadius = Utility.ButtonBorderRadius,
                     borderBottomRightRadius = Utility.ButtonBorderRadius,
                 }
             };
-            Add(_markButton);
+            _opContainer.Add(_markButton);
+
+            _opDropdownButton = new Button(ShowEditDropdownMenu)
+            {
+                style =
+                {
+                    backgroundImage = EditorGUIUtility.isProSkin
+                        ? EditorGUIUtility.Load("d_icon dropdown@2x") as Texture2D
+                        : EditorGUIUtility.Load("icon dropdown@2x") as Texture2D,
+                    alignSelf = Align.FlexEnd,
+                    width = 14,
+                    marginLeft = 0,
+                    paddingLeft = 0,
+                    borderTopLeftRadius = Utility.ButtonBorderRadius,
+                    borderTopRightRadius = Utility.ButtonBorderRadius,
+                    borderBottomLeftRadius = Utility.ButtonBorderRadius,
+                    borderBottomRightRadius = Utility.ButtonBorderRadius,
+                }
+            };
+            _opContainer.Add(_opDropdownButton);
         }
 
         public void SetNote(NoteEntry note)
@@ -216,7 +250,7 @@ namespace GBG.ProjectNotes.Editor
             Utility.CollectHistoryTimestamps(_note, _historyTimestamps);
             _historyPopup.SetValueWithoutNotify(_note?.timestamp ?? 0L);
             _contentLabel.text = _note?.content ?? "CONTENT";
-            UpdateMarkButton();
+            UpdateOpButtons();
         }
 
         public void RefreshView()
@@ -241,7 +275,7 @@ namespace GBG.ProjectNotes.Editor
                     _versionLabel.style.display = DisplayStyle.Flex;
                     _unreadLabel.style.display = DisplayStyle.None;
                     _contentLabel.text = history.content;
-                    UpdateMarkButton();
+                    UpdateOpButtons();
                     return;
                 }
             }
@@ -250,14 +284,22 @@ namespace GBG.ProjectNotes.Editor
             RefreshView();
         }
 
-        private void UpdateMarkButton()
+        // TODO: ShowEditDropdownMenu
+        private void ShowEditDropdownMenu()
+        {
+            //DropdownMenu menu = new DropdownMenu();
+            //menu.AppendAction("Edit", _ => { });
+            //menu.AppendAction("Delete", _ => { });
+        }
+
+        private void UpdateOpButtons()
         {
             _markButton.text = _note == null || _note.timestamp != _historyPopup.value
                 ? "MARK"
                 : ProjectNotesLocalCache.instance.IsUnread(_note.GetKey())
                     ? "Mark as Read"
                     : "Mark as Unread";
-            _markButton.SetEnabled(_note != null && _note.timestamp == _historyPopup.value);
+            _opContainer.SetEnabled(_note != null && _note.timestamp == _historyPopup.value);
         }
 
         private void MarkStatus()
