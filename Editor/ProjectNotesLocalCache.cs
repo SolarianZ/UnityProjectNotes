@@ -11,7 +11,7 @@ namespace GBG.ProjectNotes.Editor
         #region Category
 
         [SerializeField]
-        private string _selectedCategory;
+        private string _selectedCategory = ProjectNotesSettings.CategoryAll;
 
         public string SelectedCategory
         {

@@ -8,6 +8,7 @@ namespace GBG.ProjectNotes.Editor
         private readonly Label _titleLabel;
         private readonly Label _authorLabel;
         private readonly Label _contentLabel;
+        private readonly Button _markButton;
         private NoteEntry _note;
 
         public event Action<NoteEntry> readStatusChanged;
@@ -88,7 +89,7 @@ namespace GBG.ProjectNotes.Editor
 #endif
             contentScrollView.Add(_contentLabel);
 
-            Button markButton = new Button(MarkStatus)
+            _markButton = new Button(MarkStatus)
             {
                 text = "-",
                 style =
@@ -98,7 +99,7 @@ namespace GBG.ProjectNotes.Editor
                     width = 110,
                 }
             };
-            Add(markButton);
+            Add(_markButton);
         }
 
         public void SetNote(NoteEntry note)
@@ -107,6 +108,22 @@ namespace GBG.ProjectNotes.Editor
             _titleLabel.text = _note?.title ?? "-";
             _authorLabel.text = _note?.author ?? "-";
             _contentLabel.text = _note?.content ?? "-";
+            UpdateMarkButtonText();
+            _markButton.SetEnabled(_note != null);
+        }
+
+        public void RefreshView()
+        {
+            SetNote(_note);
+        }
+
+        private void UpdateMarkButtonText()
+        {
+            _markButton.text = _note == null
+                ? "-"
+                : ProjectNotesLocalCache.instance.IsRead(_note.GetKey())
+                    ? "Mark as Unread"
+                    : "Mark as Read";
         }
 
         private void MarkStatus()
@@ -125,6 +142,8 @@ namespace GBG.ProjectNotes.Editor
             {
                 ProjectNotesLocalCache.instance.MarkAsRead(_note.GetKey());
             }
+
+            UpdateMarkButtonText();
 
             readStatusChanged?.Invoke(_note);
         }

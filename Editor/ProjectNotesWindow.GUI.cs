@@ -238,6 +238,9 @@ namespace GBG.ProjectNotes.Editor
             noteContainer.Add(_contentView);
 
             #endregion
+
+
+            UpdateViews();
         }
 
         // Fix fixedPane null exception on Unity 2021
@@ -252,6 +255,13 @@ namespace GBG.ProjectNotes.Editor
                 resultContainer.fixedPane.style.minWidth = 200;
                 resultContainer.flexedPane.style.minWidth = 200;
             });
+        }
+
+        private void UpdateViews()
+        {
+            UpdateCategories();
+            UpdateFilteredNoteList();
+            UpdateNodeContentView();
         }
 
 
@@ -313,7 +323,37 @@ namespace GBG.ProjectNotes.Editor
 
         private void UpdateFilteredNoteList()
         {
-            // TODO
+            if (_noteEntryListView == null || !Settings)
+            {
+                return;
+            }
+
+            _filteredNotes.Clear();
+            foreach (NoteEntry note in Settings.Notes)
+            {
+                if (LocalCache.SelectedCategory == ProjectNotesSettings.CategoryAll ||
+                    LocalCache.SelectedCategory == note.category)
+                {
+                    _filteredNotes.Add(note);
+                }
+            }
+
+            _noteEntryListView.Rebuild();
+        }
+
+        #endregion
+
+
+        #region Note Content View
+
+        private void UpdateNodeContentView()
+        {
+            if (_contentView == null)
+            {
+                return;
+            }
+
+            _contentView.RefreshView();
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace GBG.ProjectNotes.Editor
 {
@@ -10,10 +11,13 @@ namespace GBG.ProjectNotes.Editor
 
         public string guid = Utility.NewGuid();
         public long timestamp = Utility.NewTimestamp();
-        public string title;
-        public string content;
         public string category;
         public string author;
+        //[HideInInspector]
+        //public string password;
+        public string title;
+        [TextArea(3, 20)]
+        public string content;
         public List<NoteHistory> contentHistory = new List<NoteHistory>();
         // TODO: public bool isDraft;
 

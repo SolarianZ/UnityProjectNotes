@@ -70,10 +70,7 @@ namespace GBG.ProjectNotes.Editor
 
         private void OnFocus()
         {
-            // TODO: refresh view, need check null!
-            // TODO: update categories and filtered notes
-            UpdateCategories();
-            UpdateFilteredNoteList();
+            UpdateViews();
         }
 
         private void Update()
@@ -101,6 +98,13 @@ namespace GBG.ProjectNotes.Editor
             menu.AddItem(new GUIContent("Inspect Settings Asset"), false, () =>
             {
                 Selection.activeObject = Settings;
+            });
+            menu.AddSeparator("");
+
+            // Document
+            menu.AddItem(new GUIContent("Unity Manual: Supported rich text tags"), false, () =>
+            {
+                Application.OpenURL("https://docs.unity3d.com/Manual/UIE-supported-tags.html");
             });
             menu.AddSeparator("");
 

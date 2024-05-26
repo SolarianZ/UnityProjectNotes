@@ -5,7 +5,6 @@ using UDebug = UnityEngine.Debug;
 
 namespace GBG.ProjectNotes.Editor
 {
-
     public class ProjectNotesSettings : ScriptableObject
     {
         #region Static
