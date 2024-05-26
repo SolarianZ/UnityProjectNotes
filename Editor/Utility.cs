@@ -6,7 +6,7 @@ namespace GBG.ProjectNotes.Editor
     public static class Utility
     {
         public static string NewGuid() => Guid.NewGuid().ToString();
-        public static long NewTimestamp() => DateTime.UtcNow.Ticks;
+        public static long NewTimestamp() => DateTime.Now.Ticks;
 
 
         public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss:fff";
