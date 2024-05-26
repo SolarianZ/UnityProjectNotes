@@ -10,6 +10,7 @@ namespace GBG.ProjectNotes.Editor
 
 
         public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss:fff";
+        public static float ButtonBorderRadius = 2;
 
         public static string FormatTimestamp(long timestamp)
         {

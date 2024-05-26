@@ -200,6 +200,24 @@ namespace GBG.ProjectNotes.Editor
             _categoryGroup.activeToggleChanged += UpdateSelecteeCategory;
             categoryContainer.Add(_categoryGroup);
 
+            Button newNoteButton = new Button(AddNewNote)
+            {
+                text = "＋",
+                tooltip = "Add New Note",
+                style =
+                {
+                    alignSelf = Align.Center,
+                    fontSize = 16,
+                    width = 20,
+                    height = 20,
+                    borderTopLeftRadius = Utility.ButtonBorderRadius,
+                    borderTopRightRadius = Utility.ButtonBorderRadius,
+                    borderBottomLeftRadius = Utility.ButtonBorderRadius,
+                    borderBottomRightRadius = Utility.ButtonBorderRadius,
+                }
+            };
+            categoryContainer.Add(newNoteButton);
+
             #endregion
 
 
@@ -276,6 +294,12 @@ namespace GBG.ProjectNotes.Editor
             }
 
             _noteEntryListView.Rebuild();
+        }
+
+        private void AddNewNote()
+        {
+            // TODO : AddNewNote
+            Debug.LogError("TODO: Add New Note");
         }
 
 

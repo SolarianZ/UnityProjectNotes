@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,6 +14,9 @@ namespace GBG.ProjectNotes.Editor
         public static Color unreadLabelBorderColor = new Color32(240, 0, 0, 255);
         public static float statusLabelBorderWidth = 2;
         public static float statusLabelBorderRadius = 4;
+        public static float contentLabelBorderSize = 1;
+        public static Color contentLabelBorderColorDark = new Color32(44, 44, 44, 255);
+        public static Color contentLabelBorderColorLight = new Color32(177, 177, 177, 255);
 
         private readonly Label _versionLabel;
         private readonly Label _unreadLabel;
@@ -27,10 +31,11 @@ namespace GBG.ProjectNotes.Editor
         public event Action<NoteEntry> readStatusChanged;
 
 
+        // TODO : Edit(Modify/Delete)
         public NoteContentView()
         {
             style.paddingLeft = 8;
-            style.paddingRight = 4;
+            style.paddingRight = 6;
             style.paddingTop = 4;
             style.paddingBottom = 4;
 
@@ -158,6 +163,18 @@ namespace GBG.ProjectNotes.Editor
                     flexGrow = 1,
                     fontSize = 14,
                     whiteSpace = WhiteSpace.Normal,
+                    //borderLeftWidth = contentLabelBorderSize,
+                    //borderRightWidth = contentLabelBorderSize,
+                    //borderTopWidth = contentLabelBorderSize,
+                    //borderBottomWidth = contentLabelBorderSize,
+                    //borderTopLeftRadius = contentLabelBorderSize,
+                    //borderTopRightRadius = contentLabelBorderSize,
+                    //borderBottomLeftRadius = contentLabelBorderSize,
+                    //borderBottomRightRadius = contentLabelBorderSize,
+                    //borderLeftColor = EditorGUIUtility.isProSkin ? contentLabelBorderColorDark : contentLabelBorderColorLight,
+                    //borderRightColor = EditorGUIUtility.isProSkin ? contentLabelBorderColorDark : contentLabelBorderColorLight,
+                    //borderTopColor = EditorGUIUtility.isProSkin ? contentLabelBorderColorDark : contentLabelBorderColorLight,
+                    //borderBottomColor = EditorGUIUtility.isProSkin ? contentLabelBorderColorDark : contentLabelBorderColorLight,
                 }
             };
 #if UNITY_2022_3_OR_NEWER
@@ -173,10 +190,10 @@ namespace GBG.ProjectNotes.Editor
                     alignSelf = Align.FlexEnd,
                     width = 110,
                     marginBottom = 5,
-                    borderTopLeftRadius = 2,
-                    borderTopRightRadius = 2,
-                    borderBottomLeftRadius = 2,
-                    borderBottomRightRadius = 2,
+                    borderTopLeftRadius = Utility.ButtonBorderRadius,
+                    borderTopRightRadius = Utility.ButtonBorderRadius,
+                    borderBottomLeftRadius = Utility.ButtonBorderRadius,
+                    borderBottomRightRadius = Utility.ButtonBorderRadius,
                 }
             };
             Add(_markButton);
