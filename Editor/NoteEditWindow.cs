@@ -8,10 +8,10 @@ namespace GBG.ProjectNotes.Editor
 {
     public class NoteEditWindow : EditorWindow
     {
-        public static NoteEditWindow Open(NoteEntry note, Action<NoteEntry> onSubmit)
+        public static NoteEditWindow Open(NoteEntry note, Action<NoteEntry> onSave)
         {
             _note = note;
-            _onSubmit = onSubmit;
+            _onSave = onSave;
             NoteEditWindow window = GetWindow<NoteEditWindow>(true);
             //window.ShowModalUtility();
             return window;
@@ -19,7 +19,7 @@ namespace GBG.ProjectNotes.Editor
 
 
         private static NoteEntry _note;
-        private static Action<NoteEntry> _onSubmit;
+        private static Action<NoteEntry> _onSave;
 
         public TextField _guidField;
         public LongField _timestampField;
@@ -109,9 +109,9 @@ namespace GBG.ProjectNotes.Editor
             _contentField.Q(name: "unity-text-input").style.minHeight = 180;
             scrollView.Add(_contentField);
 
-            Button submitButton = new Button(SubmitAndClose)
+            Button submitButton = new Button(SaveAndClose)
             {
-                text = GetSubmitButtonText(),
+                text = "Save",
                 style =
                 {
                     alignSelf = Align.FlexEnd,
@@ -119,12 +119,17 @@ namespace GBG.ProjectNotes.Editor
                     marginBottom = 4,
                     marginLeft = 4,
                     marginRight = 4,
-                    minHeight = 30,
-                    maxHeight = 30,
-                    width = 100,
+                    height = 24,
+                    width = 60,
                 },
             };
             root.Add(submitButton);
+        }
+
+        private void OnDisable()
+        {
+            _note = null;
+            _onSave = null;
         }
 
         private void SetWindowTitle()
@@ -139,27 +144,23 @@ namespace GBG.ProjectNotes.Editor
             }
         }
 
-        private string GetSubmitButtonText()
+        private void SaveAndClose()
         {
-            if (_note == null)
+            if (_onSave == null)
             {
-                return "Add";
-            }
-            else
-            {
-                return "Save";
-            }
-        }
-
-        private void SubmitAndClose()
-        {
-            if (_onSubmit == null)
-            {
-                _note = null;
                 Close();
                 return;
             }
 
+            string message = _note == null
+                ? "Once the settings is synced to the version control system, this note will be added to the project of all team members."
+                : "Once the settings is synced to the version control system, this note will be updated in the project of all team members.";
+            if (!EditorUtility.DisplayDialog("Save note content?", message, "Save", "Cancel"))
+            {
+                return;
+            }
+
+            Action<NoteEntry> onSubmit = _onSave;
             NoteEntry note = new NoteEntry
             {
                 guid = _guidField.value,
@@ -172,10 +173,6 @@ namespace GBG.ProjectNotes.Editor
             };
 
             Close();
-
-            Action<NoteEntry> onSubmit = _onSubmit;
-            _note = null;
-            _onSubmit = null;
             onSubmit(note);
         }
     }

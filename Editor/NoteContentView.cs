@@ -25,12 +25,13 @@ namespace GBG.ProjectNotes.Editor
         private readonly PopupField<long> _historyPopup;
         private readonly List<long> _historyTimestamps = new List<long>();
         private readonly Label _contentLabel;
-        private readonly VisualElement _opContainer;
         private readonly Button _markButton;
         private readonly Button _opDropdownButton;
         private NoteEntry _note;
 
         public event Action<NoteEntry> readStatusChanged;
+        public event Action<NoteEntry> wantsToEditNote;
+        public event Action<NoteEntry, long> wantsToDeleteNote;
 
 
         public NoteContentView()
@@ -183,25 +184,24 @@ namespace GBG.ProjectNotes.Editor
 #endif
             contentScrollView.Add(_contentLabel);
 
-            _opContainer = new VisualElement
+            VisualElement opContainer = new VisualElement
             {
                 style =
                 {
                     flexDirection = FlexDirection.Row,
                     justifyContent = Justify.FlexEnd,
-                    minHeight= 28,
-                    maxHeight= 28,
-                    marginBottom = 4,
+                    minHeight= 22,
+                    maxHeight= 22,
+                    marginBottom = 2,
                 },
             };
-            Add(_opContainer);
+            Add(opContainer);
 
             _markButton = new Button(MarkStatus)
             {
                 text = "-",
                 style =
                 {
-                    alignSelf = Align.FlexEnd,
                     width = 110,
                     marginRight = 0,
                     paddingRight = 0,
@@ -211,16 +211,15 @@ namespace GBG.ProjectNotes.Editor
                     borderBottomRightRadius = Utility.ButtonBorderRadius,
                 }
             };
-            _opContainer.Add(_markButton);
+            opContainer.Add(_markButton);
 
-            _opDropdownButton = new Button(ShowEditDropdownMenu)
+            _opDropdownButton = new Button(CreateOpDropdownMenu)
             {
                 style =
                 {
                     backgroundImage = EditorGUIUtility.isProSkin
                         ? EditorGUIUtility.Load("d_icon dropdown@2x") as Texture2D
                         : EditorGUIUtility.Load("icon dropdown@2x") as Texture2D,
-                    alignSelf = Align.FlexEnd,
                     width = 14,
                     marginLeft = 0,
                     paddingLeft = 0,
@@ -230,7 +229,7 @@ namespace GBG.ProjectNotes.Editor
                     borderBottomRightRadius = Utility.ButtonBorderRadius,
                 }
             };
-            _opContainer.Add(_opDropdownButton);
+            opContainer.Add(_opDropdownButton);
         }
 
         public void SetNote(NoteEntry note)
@@ -258,6 +257,28 @@ namespace GBG.ProjectNotes.Editor
             SetNote(_note);
         }
 
+        private void CreateOpDropdownMenu()
+        {
+            if (_note == null)
+            {
+                return;
+            }
+
+            GenericMenu menu = new GenericMenu();
+            if (_note.timestamp == _historyPopup.value)
+            {
+                menu.AddItem(new GUIContent("Edit"), false, OnWantsToEditNote);
+                menu.AddSeparator("");
+                menu.AddItem(new GUIContent("Delete"), false, OnWantsToDeleteNote);
+                menu.DropDown(_opDropdownButton.worldBound);
+            }
+            else
+            {
+                menu.AddItem(new GUIContent("Delete"), false, OnWantsToDeleteNote);
+                menu.DropDown(_opDropdownButton.worldBound);
+            }
+        }
+
         private void SelectHistory(ChangeEvent<long> evt)
         {
             long timestamp = evt.newValue;
@@ -280,16 +301,8 @@ namespace GBG.ProjectNotes.Editor
                 }
             }
 
-            UDebug.LogError($"Unable to find historical version for timestamp '{timestamp}'.");
+            UDebug.LogError($"[Project Notes] Unable to find historical version for timestamp '{timestamp}'.");
             RefreshView();
-        }
-
-        // TODO: ShowEditDropdownMenu
-        private void ShowEditDropdownMenu()
-        {
-            //DropdownMenu menu = new DropdownMenu();
-            //menu.AppendAction("Edit", _ => { });
-            //menu.AppendAction("Delete", _ => { });
         }
 
         private void UpdateOpButtons()
@@ -299,7 +312,8 @@ namespace GBG.ProjectNotes.Editor
                 : ProjectNotesLocalCache.instance.IsUnread(_note.GetKey())
                     ? "Mark as Read"
                     : "Mark as Unread";
-            _opContainer.SetEnabled(_note != null && _note.timestamp == _historyPopup.value);
+            _markButton.SetEnabled(_note != null && _note.timestamp == _historyPopup.value);
+            _opDropdownButton.SetEnabled(_note != null);
         }
 
         private void MarkStatus()
@@ -322,6 +336,32 @@ namespace GBG.ProjectNotes.Editor
             RefreshView();
 
             readStatusChanged?.Invoke(_note);
+        }
+
+        private void OnWantsToEditNote()
+        {
+            if (_note == null)
+            {
+                return;
+            }
+
+            wantsToEditNote?.Invoke(_note);
+        }
+
+        private void OnWantsToDeleteNote()
+        {
+            if (_note == null)
+            {
+                return;
+            }
+
+            string message = $"{_note.title}\n\n" +
+                $"This operation cannot be undone.\n" +
+                $"Once the settings is synced to the version control system, this note will be removed from the project of all team members.";
+            if (EditorUtility.DisplayDialog("Delete selected note?", message, "Delete", "Cancel"))
+            {
+                wantsToDeleteNote?.Invoke(_note, _historyPopup.value);
+            }
         }
     }
 }

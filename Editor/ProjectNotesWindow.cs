@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UDebug = UnityEngine.Debug;
 
 namespace GBG.ProjectNotes.Editor
 {
@@ -90,9 +91,73 @@ namespace GBG.ProjectNotes.Editor
         }
 
 
-        private void OnSubmitNoteEntry(NoteEntry note)
+        private void SaveNote(NoteEntry note)
         {
-            Debug.LogError($"TODO: OnSubmitNoteEntry: {note}");
+            UDebug.LogError($"TODO: OnSubmitNoteEntry: {note}");
+        }
+
+        private void DeleteNote(NoteEntry noteToDelete, long timestampToDelete)
+        {
+            if (!Settings)
+            {
+                return;
+            }
+
+            bool deleted = false;
+            bool deletedHistory = false;
+            for (int i = 0; i < Settings.Notes.Count; i++)
+            {
+                NoteEntry note = Settings.Notes[i];
+                if (note != noteToDelete)
+                {
+                    continue;
+                }
+
+                if (note.timestamp == timestampToDelete)
+                {
+                    Settings.Notes.RemoveAt(i);
+                    deleted = true;
+                    break;
+                }
+
+                bool breakOuter = false;
+                for (int j = 0; j < note.contentHistory.Count; j++)
+                {
+                    NoteHistory history = note.contentHistory[j];
+                    if (history.timestamp == timestampToDelete)
+                    {
+                        note.contentHistory.RemoveAt(j);
+                        deleted = true;
+                        deletedHistory = true;
+                        breakOuter = true;
+                        break;
+                    }
+                }
+                if (breakOuter)
+                {
+                    break;
+                }
+            }
+
+            if (deleted)
+            {
+                Settings.ForceSave();
+
+                if (deletedHistory)
+                {
+                    UDebug.Log($"[Project Notes] Note history deleted: {noteToDelete.title} {Utility.FormatTimestamp(timestampToDelete)}.");
+                    _contentView.RefreshView();
+                }
+                else
+                {
+                    UDebug.Log($"[Project Notes] Note deleted: {noteToDelete.title} {Utility.FormatTimestamp(timestampToDelete)}.");
+                    UpdateViews(false);
+                }
+            }
+            else
+            {
+                UDebug.Log($"[Project Notes] Failed to delete note: {noteToDelete.title} {Utility.FormatTimestamp(timestampToDelete)}.");
+            }
         }
 
 

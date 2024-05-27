@@ -256,6 +256,8 @@ namespace GBG.ProjectNotes.Editor
 
             _contentView = new NoteContentView();
             _contentView.readStatusChanged += OnNoteReadStatusChanged;
+            _contentView.wantsToEditNote += EditNote;
+            _contentView.wantsToDeleteNote += DeleteNote;
             noteContainer.Add(_contentView);
 
             #endregion
@@ -278,10 +280,10 @@ namespace GBG.ProjectNotes.Editor
             });
         }
 
-        private void UpdateViews()
+        private void UpdateViews(bool clearNoteSelection = false)
         {
             UpdateCategories();
-            UpdateFilteredNoteList();
+            UpdateFilteredNoteList(clearNoteSelection);
             UpdateNodeContentView();
         }
 
@@ -313,7 +315,12 @@ namespace GBG.ProjectNotes.Editor
 
         private void AddNewNote()
         {
-            NoteEditWindow.Open(null, OnSubmitNoteEntry);
+            NoteEditWindow.Open(null, SaveNote);
+        }
+
+        private void EditNote(NoteEntry note)
+        {
+            NoteEditWindow.Open(note, SaveNote);
         }
 
 
@@ -358,7 +365,7 @@ namespace GBG.ProjectNotes.Editor
         {
             string category = toggle.text;
             LocalCache.SelectedCategory = category;
-            UpdateFilteredNoteList();
+            UpdateFilteredNoteList(true);
             if (_filteredNotes.Count > 0)
             {
                 _noteEntryListView.selectedIndex = 0;
@@ -393,7 +400,7 @@ namespace GBG.ProjectNotes.Editor
             _contentView.SetNote(note);
         }
 
-        private void UpdateFilteredNoteList()
+        private void UpdateFilteredNoteList(bool clearNoteSelection)
         {
             if (_noteEntryListView == null || !Settings)
             {
@@ -410,6 +417,7 @@ namespace GBG.ProjectNotes.Editor
                 }
             }
 
+            _noteEntryListView.ClearSelection();
             _noteEntryListView.Rebuild();
         }
 
