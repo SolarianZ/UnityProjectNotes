@@ -104,7 +104,7 @@ namespace GBG.ProjectNotes.Editor
                 Settings.ForceSave();
                 LocalCache.SelectedCategory = noteToSave.categoryTrimmed;
                 UpdateViews(noteToSave);
-                UDebug.Log($"[Project Notes] New note added: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
+                UDebug.Log($"[Project Notes] Note added: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
                 return;
             }
 

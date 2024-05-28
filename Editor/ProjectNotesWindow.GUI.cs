@@ -404,16 +404,30 @@ namespace GBG.ProjectNotes.Editor
             }
 
             _filteredNotes.Clear();
-            foreach (NoteEntry note in Settings.Notes)
+            foreach (NoteEntry newNote in Settings.Notes)
             {
                 if (LocalCache.SelectedCategory == ProjectNotesSettings.CategoryAll ||
-                    LocalCache.SelectedCategory == note.categoryTrimmed)
+                    LocalCache.SelectedCategory == newNote.categoryTrimmed)
                 {
-                    _filteredNotes.Add(note);
+                    bool added = false;
+                    for (int i = _filteredNotes.Count - 1; i >= 0; i--)
+                    {
+                        NoteEntry note = _filteredNotes[i];
+                        if (note.priority >= newNote.priority)
+                        {
+                            _filteredNotes.Insert(i + 1, newNote);
+                            added = true;
+                            break;
+                        }
+                    }
+                    if (!added)
+                    {
+                        _filteredNotes.Insert(0, newNote);
+                    }
                 }
             }
 
-            if (selection != _noteEntryListView.selectedItem)
+            if (selection != _noteEntryListView.selectedItem || _noteEntryListView.selectedItem == null)
             {
                 if (selection == null)
                 {

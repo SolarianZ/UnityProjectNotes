@@ -27,6 +27,7 @@ namespace GBG.ProjectNotes.Editor
         public TextField _categoryField;
         public TextField _authorField;
         public Toggle _draftField;
+        public IntegerField _priorityField;
         public TextField _titleField;
         public TextField _contentField;
 
@@ -89,6 +90,14 @@ namespace GBG.ProjectNotes.Editor
             };
             _draftField.Q<Label>().style.minWidth = LabelWidth;
             scrollView.Add(_draftField);
+
+            _priorityField = new IntegerField("Priority")
+            {
+                value = _note?.priority ?? 0,
+                style = { unityTextAlign = TextAnchor.MiddleRight, },
+            };
+            _priorityField.Q<Label>().style.minWidth = LabelWidth;
+            scrollView.Add(_priorityField);
 
             _titleField = new TextField("Title")
             {
@@ -170,6 +179,7 @@ namespace GBG.ProjectNotes.Editor
                 category = _categoryField.value?.Trim(),
                 author = _authorField.value,
                 isDraft = _draftField.value,
+                priority = _priorityField.value,
                 title = _titleField.value,
                 content = _contentField.value,
             };

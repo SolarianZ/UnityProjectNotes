@@ -66,6 +66,7 @@ namespace GBG.ProjectNotes.Editor
             {
                 category = "Sample",
                 author = "ZQY",
+                priority = int.MaxValue,
                 title = "Sample Note / 示例信息",
                 content = "This is a <b>sample note.</b>\r\n这是一个<b>示例信息。</b>\r\n\r\n" +
                           "You can input some information here and then upload this asset to a version control system to share the information within your team.\r\n" +
