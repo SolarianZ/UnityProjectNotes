@@ -102,6 +102,7 @@ namespace GBG.ProjectNotes.Editor
             {
                 Settings.Notes.Add(noteToSave);
                 Settings.ForceSave();
+                LocalCache.MarkAsRead(noteToSave.GetKey());
                 LocalCache.SelectedCategory = noteToSave.categoryTrimmed;
                 UpdateViews(noteToSave);
                 UDebug.Log($"[Project Notes] Note added: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
@@ -118,6 +119,7 @@ namespace GBG.ProjectNotes.Editor
 
                 note.Update(noteToSave);
                 Settings.ForceSave();
+                LocalCache.MarkAsRead(noteToSave.GetKey());
                 UDebug.Log($"[Project Notes] Note updated: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
                 return;
             }
