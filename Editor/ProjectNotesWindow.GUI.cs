@@ -293,7 +293,7 @@ namespace GBG.ProjectNotes.Editor
             foreach (VisualElement child in _categoryGroup.Children())
             {
                 CategoryEntryToggle entryToggle = (CategoryEntryToggle)child;
-                if (entryToggle.text == changedNote.GetTrimmedCategory())
+                if (entryToggle.text == changedNote.categoryTrimmed)
                 {
                     entryToggle.redDotIconVisible = Utility.HasUnreadNotesInCategory(entryToggle.text);
                 }
@@ -335,22 +335,21 @@ namespace GBG.ProjectNotes.Editor
 
             if (selection != null && LocalCache.SelectedCategory != ProjectNotesSettings.CategoryAll)
             {
-                LocalCache.SelectedCategory = selection.category;
+                LocalCache.SelectedCategory = selection.categoryTrimmed;
             }
 
             _categoryGroup.Clear();
             if (Settings)
             {
                 bool selectedCategoryFound = false;
-                List<string> categories = Settings.CollectCategories();
-                List<string> unreadCategories = Settings.CollectCategoriesWithUnreadNotes();
-                foreach (string category in categories)
+                List<CategoryInfo> categoryInfos = Settings.CollectCategoriesOrderByMaxPriority();
+                foreach (CategoryInfo categoryInfo in categoryInfos)
                 {
-                    CategoryEntryToggle entry = new CategoryEntryToggle(category)
+                    CategoryEntryToggle entry = new CategoryEntryToggle(categoryInfo.category)
                     {
-                        redDotIconVisible = unreadCategories.Contains(category),
+                        redDotIconVisible = categoryInfo.hasUnreadNotes,
                     };
-                    if (category == LocalCache.SelectedCategory)
+                    if (categoryInfo.category == LocalCache.SelectedCategory)
                     {
                         selectedCategoryFound = true;
                         entry.SetValueWithoutNotify(true);
@@ -371,10 +370,6 @@ namespace GBG.ProjectNotes.Editor
             string category = toggle.text;
             LocalCache.SelectedCategory = category;
             UpdateFilteredNoteList(null);
-            if (_filteredNotes.Count > 0)
-            {
-                _noteEntryListView.selectedIndex = 0;
-            }
         }
 
         #endregion
@@ -412,7 +407,7 @@ namespace GBG.ProjectNotes.Editor
             foreach (NoteEntry note in Settings.Notes)
             {
                 if (LocalCache.SelectedCategory == ProjectNotesSettings.CategoryAll ||
-                    LocalCache.SelectedCategory == note.GetTrimmedCategory())
+                    LocalCache.SelectedCategory == note.categoryTrimmed)
                 {
                     _filteredNotes.Add(note);
                 }
@@ -422,7 +417,7 @@ namespace GBG.ProjectNotes.Editor
             {
                 if (selection == null)
                 {
-                    _noteEntryListView.ClearSelection();
+                    _noteEntryListView.selectedIndex = _filteredNotes.Count > 0 ? 0 : -1;
                 }
                 else
                 {

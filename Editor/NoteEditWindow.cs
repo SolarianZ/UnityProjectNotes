@@ -68,7 +68,7 @@ namespace GBG.ProjectNotes.Editor
 
             _categoryField = new TextField("Category")
             {
-                value = _note?.category,
+                value = _note?.categoryTrimmed,
                 style = { unityTextAlign = TextAnchor.MiddleRight, },
             };
             _categoryField.Q<Label>().style.minWidth = LabelWidth;
@@ -167,7 +167,7 @@ namespace GBG.ProjectNotes.Editor
             {
                 guid = _guidField.value,
                 timestamp = _timestampField.value,
-                category = _categoryField.value,
+                category = _categoryField.value?.Trim(),
                 author = _authorField.value,
                 isDraft = _draftField.value,
                 title = _titleField.value,

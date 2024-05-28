@@ -246,7 +246,7 @@ namespace GBG.ProjectNotes.Editor
                 : DisplayStyle.None;
             _titleLabel.text = _note?.title ?? "TITLE";
             _authorLabel.text = _note == null ? "AUTHOR" : $"by {_note.author}";
-            Utility.CollectHistoryTimestamps(_note, _historyTimestamps);
+            _note.CollectHistoryTimestamps(_historyTimestamps);
             _historyPopup.SetValueWithoutNotify(_note?.timestamp ?? 0L);
             _contentLabel.text = _note?.content ?? "CONTENT";
             UpdateOpButtons();

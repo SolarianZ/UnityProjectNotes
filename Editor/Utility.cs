@@ -17,7 +17,7 @@ namespace GBG.ProjectNotes.Editor
             return new DateTime(timestamp).ToString(DateTimeFormat);
         }
 
-        public static void CollectHistoryTimestamps(NoteEntry note, List<long> timestamps)
+        public static void CollectHistoryTimestamps(this NoteEntry note, List<long> timestamps)
         {
             timestamps.Clear();
             if (note == null)
@@ -55,7 +55,7 @@ namespace GBG.ProjectNotes.Editor
 
             foreach (NoteEntry note in settings.Notes)
             {
-                if (note.GetTrimmedCategory() == category &&
+                if (note.categoryTrimmed == category &&
                     ProjectNotesLocalCache.instance.IsUnread(note.GetKey()))
                 {
                     return true;
@@ -63,6 +63,88 @@ namespace GBG.ProjectNotes.Editor
             }
 
             return false;
+        }
+
+        public static List<CategoryInfo> CollectCategoriesOrderByMaxPriority(this ProjectNotesSettings settings, bool addCategoryAll = true)
+        {
+            Dictionary<string, CategoryInfo> categoryInfoDict = new Dictionary<string, CategoryInfo>();
+            bool hasUnreadNotes = false;
+            foreach (NoteEntry note in settings.Notes)
+            {
+                string category = note.categoryTrimmed;
+                if (category == ProjectNotesSettings.CategoryAll || string.IsNullOrEmpty(category))
+                {
+                    if (!hasUnreadNotes && addCategoryAll)
+                    {
+                        hasUnreadNotes = ProjectNotesLocalCache.instance.IsUnread(note.GetKey());
+                    }
+                    continue;
+                }
+
+                if (!categoryInfoDict.TryGetValue(category, out CategoryInfo categoryInfo))
+                {
+                    bool noteUnread = ProjectNotesLocalCache.instance.IsUnread(note.GetKey());
+                    hasUnreadNotes |= noteUnread;
+                    categoryInfo = new CategoryInfo
+                    {
+                        category = category,
+                        maxPriority = note.priority,
+                        hasUnreadNotes = noteUnread,
+                    };
+                    categoryInfoDict[category] = categoryInfo;
+
+                    continue;
+                }
+
+                bool infoChanged = false;
+                if (categoryInfo.maxPriority < note.priority)
+                {
+                    categoryInfo.maxPriority = note.priority;
+                    infoChanged = true;
+                }
+                if (!categoryInfo.hasUnreadNotes && ProjectNotesLocalCache.instance.IsUnread(note.GetKey()))
+                {
+                    categoryInfo.hasUnreadNotes = true;
+                    infoChanged = true;
+                }
+                if (infoChanged)
+                {
+                    categoryInfoDict[category] = categoryInfo;
+                }
+            }
+
+            List<CategoryInfo> categoryInfos = new List<CategoryInfo>(categoryInfoDict.Count + 1);
+            if (addCategoryAll)
+            {
+                categoryInfos.Add(new CategoryInfo
+                {
+                    category = ProjectNotesSettings.CategoryAll,
+                    maxPriority = int.MaxValue,
+                    hasUnreadNotes = hasUnreadNotes,
+                });
+            }
+
+            foreach (CategoryInfo newCategoryInfo in categoryInfoDict.Values)
+            {
+                bool added = false;
+                for (int i = categoryInfos.Count - 1; i >= 0; i--)
+                {
+                    CategoryInfo categoryInfo = categoryInfos[i];
+                    if (categoryInfo.maxPriority >= newCategoryInfo.maxPriority)
+                    {
+                        categoryInfos.Insert(i + 1, newCategoryInfo);
+                        added = true;
+                        break;
+                    }
+                }
+
+                if (!added)
+                {
+                    categoryInfos.Insert(0, newCategoryInfo);
+                }
+            }
+
+            return categoryInfos;
         }
 
 

@@ -102,7 +102,7 @@ namespace GBG.ProjectNotes.Editor
             {
                 Settings.Notes.Add(noteToSave);
                 Settings.ForceSave();
-                LocalCache.SelectedCategory = noteToSave.category;
+                LocalCache.SelectedCategory = noteToSave.categoryTrimmed;
                 UpdateViews(noteToSave);
                 UDebug.Log($"[Project Notes] New note added: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
                 return;
@@ -180,7 +180,17 @@ namespace GBG.ProjectNotes.Editor
                 else
                 {
                     UDebug.Log($"[Project Notes] Note deleted: {noteToDelete.title} {Utility.FormatTimestamp(timestampToDelete)}.");
-                    UpdateViews((NoteEntry)_noteEntryListView.selectedItem);
+                    NoteEntry selection = null;
+                    if (_filteredNotes.Count > 1)
+                    {
+                        NoteEntry candidate = _filteredNotes[0];
+                        if (candidate == noteToDelete)
+                        {
+                            candidate = _filteredNotes[1];
+                        }
+                        selection = candidate;
+                    }
+                    UpdateViews(selection);
                 }
             }
             else

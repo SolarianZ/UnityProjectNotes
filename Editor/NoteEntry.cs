@@ -17,10 +17,13 @@ namespace GBG.ProjectNotes.Editor
         public bool isDraft;
         //[HideInInspector]
         //public string password;
+        public int priority;
         public string title;
         [TextArea(3, 20)]
         public string content;
         public List<NoteHistory> contentHistory = new List<NoteHistory>();
+
+        public string categoryTrimmed => category?.Trim();
 
 
         // Allow to clear remote read status
@@ -42,11 +45,10 @@ namespace GBG.ProjectNotes.Editor
             category = newNote.category;
             author = newNote.author;
             isDraft = newNote.isDraft;
+            priority = newNote.priority;
             title = newNote.title;
             content = newNote.content;
         }
-
-        public string GetTrimmedCategory() => category?.Trim();
 
         public NoteKey GetKey()
         {

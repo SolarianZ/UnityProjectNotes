@@ -84,61 +84,6 @@ namespace GBG.ProjectNotes.Editor
         };
 
 
-        public List<string> CollectCategories(bool addCategoryAll = true)
-        {
-            HashSet<string> categoriesHashSet = new HashSet<string>();
-            foreach (NoteEntry note in _notes)
-            {
-                string category = note.GetTrimmedCategory();
-                if (category == CategoryAll || string.IsNullOrEmpty(category))
-                {
-                    continue;
-                }
-
-                categoriesHashSet.Add(category);
-            }
-
-            List<string> categories = new List<string>(categoriesHashSet.Count + 1);
-            if (addCategoryAll)
-            {
-                categories.Add(CategoryAll);
-            }
-            categories.AddRange(categoriesHashSet);
-            return categories;
-        }
-
-        public List<string> CollectCategoriesWithUnreadNotes(bool addCategoryAll = true)
-        {
-            HashSet<string> unreadCategoriesHashSet = new HashSet<string>();
-            bool hasUnreadNotes = false;
-            foreach (NoteEntry note in _notes)
-            {
-                string category = note.GetTrimmedCategory();
-                if (category == CategoryAll || string.IsNullOrEmpty(category))
-                {
-                    if (!hasUnreadNotes && addCategoryAll)
-                    {
-                        hasUnreadNotes = ProjectNotesLocalCache.instance.IsUnread(note.GetKey());
-                    }
-                    continue;
-                }
-
-                if (ProjectNotesLocalCache.instance.IsUnread(note.GetKey()))
-                {
-                    hasUnreadNotes = true;
-                    unreadCategoriesHashSet.Add(category);
-                }
-            }
-
-            List<string> categories = new List<string>(unreadCategoriesHashSet.Count + 1);
-            if (addCategoryAll && hasUnreadNotes)
-            {
-                categories.Add(CategoryAll);
-            }
-            categories.AddRange(unreadCategoriesHashSet);
-            return categories;
-        }
-
         [ContextMenu("Force Save", false, 0)]
         internal void ForceSave()
         {
