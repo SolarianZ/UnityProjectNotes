@@ -274,7 +274,7 @@ namespace GBG.ProjectNotes.Editor
             }
             else
             {
-                menu.AddItem(new GUIContent("Delete"), false, OnWantsToDeleteNote);
+                menu.AddItem(new GUIContent("Delete Old Version"), false, OnWantsToDeleteNote);
                 menu.DropDown(_opDropdownButton.worldBound);
             }
         }
@@ -355,10 +355,17 @@ namespace GBG.ProjectNotes.Editor
                 return;
             }
 
-            string message = $"{_note.title}\n\n" +
+            bool oldVersion = _note.timestamp != _historyPopup.value;
+            string title = oldVersion
+                ? "Delete old version of the selected note?"
+                : "Delete selected note?";
+            string messageHeader = oldVersion
+                ? $"{_note.title}\nVersion: {Utility.FormatTimestamp(_historyPopup.value)}\n\n"
+                : $"{_note.title}\n\n";
+            string message = messageHeader +
                 $"This operation cannot be undone.\n" +
                 $"Once the settings is synced to the version control system, this note will be removed from the project of all team members.";
-            if (EditorUtility.DisplayDialog("Delete selected note?", message, "Delete", "Cancel"))
+            if (EditorUtility.DisplayDialog(title, message, "Delete", "Cancel"))
             {
                 wantsToDeleteNote?.Invoke(_note, _historyPopup.value);
             }
