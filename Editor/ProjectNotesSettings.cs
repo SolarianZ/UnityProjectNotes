@@ -28,7 +28,7 @@ namespace GBG.ProjectNotes.Editor
                     _instance = AssetDatabase.LoadAssetAtPath<ProjectNotesSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
                     if (guids.Length > 1)
                     {
-                        UDebug.LogWarning($"[Project Notes] Multiple {nameof(ProjectNotesSettings)} instances found, using the first one. Please remove duplicates.", _instance);
+                        UDebug.LogError($"[Project Notes] Multiple {nameof(ProjectNotesSettings)} instances found, using the first one. Please remove duplicates.", _instance);
                     }
                 }
 
@@ -68,11 +68,15 @@ namespace GBG.ProjectNotes.Editor
                 author = "ZQY",
                 title = "Sample Note / 示例信息",
                 content = "This is a <b>sample note.</b>\r\n这是一个<b>示例信息。</b>\r\n\r\n" +
-                          "You can enter some information here and then upload this asset to a version control system to share the information within the team.\r\n" +
+                          "You can input some information here and then upload this asset to a version control system to share the information within your team.\r\n" +
                           "可以在这里输入一些信息，然后将此资产上传到版本控制系统，来在团队中分享信息。\r\n\r\n" +
                           "The information content supports <color=green>rich text</color>, see reference:\r\n" +
                           "信息内容支持<color=green>富文本</color>，参考：\r\n\r\n" +
+#if UNITY_2022_3_OR_NEWER
+                          "    <a href=\"https://docs.unity3d.com/Manual/UIE-supported-tags.html\">Supported rich text tags</a>",
+#else
                           "    <i>https://docs.unity3d.com/Manual/UIE-supported-tags.html</i>",
+#endif
                 contentHistory = {
                     new NoteHistory(638523554912390682, "This is a <color=blue>historical version</color> sample.\r\n这是一个<color=blue>历史版本</color>示例。")
                 },

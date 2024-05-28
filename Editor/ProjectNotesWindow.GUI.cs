@@ -263,7 +263,7 @@ namespace GBG.ProjectNotes.Editor
             #endregion
 
 
-            UpdateViews();
+            UpdateViews(null);
         }
 
         // Fix fixedPane null exception on Unity 2021
@@ -280,10 +280,10 @@ namespace GBG.ProjectNotes.Editor
             });
         }
 
-        private void UpdateViews(bool clearNoteSelection = false)
+        private void UpdateViews(NoteEntry selection)
         {
-            UpdateCategories();
-            UpdateFilteredNoteList(clearNoteSelection);
+            UpdateCategories(selection);
+            UpdateFilteredNoteList(selection);
             UpdateNodeContentView();
         }
 
@@ -326,11 +326,16 @@ namespace GBG.ProjectNotes.Editor
 
         #region Category
 
-        private void UpdateCategories()
+        private void UpdateCategories(NoteEntry selection)
         {
             if (_categoryGroup == null)
             {
                 return;
+            }
+
+            if (selection != null && LocalCache.SelectedCategory != ProjectNotesSettings.CategoryAll)
+            {
+                LocalCache.SelectedCategory = selection.category;
             }
 
             _categoryGroup.Clear();
@@ -365,14 +370,10 @@ namespace GBG.ProjectNotes.Editor
         {
             string category = toggle.text;
             LocalCache.SelectedCategory = category;
-            UpdateFilteredNoteList(true);
+            UpdateFilteredNoteList(null);
             if (_filteredNotes.Count > 0)
             {
                 _noteEntryListView.selectedIndex = 0;
-            }
-            else
-            {
-                _noteEntryListView.ClearSelection();
             }
         }
 
@@ -400,7 +401,7 @@ namespace GBG.ProjectNotes.Editor
             _contentView.SetNote(note);
         }
 
-        private void UpdateFilteredNoteList(bool clearNoteSelection)
+        private void UpdateFilteredNoteList(NoteEntry selection)
         {
             if (_noteEntryListView == null || !Settings)
             {
@@ -417,7 +418,19 @@ namespace GBG.ProjectNotes.Editor
                 }
             }
 
-            _noteEntryListView.ClearSelection();
+            if (selection != _noteEntryListView.selectedItem)
+            {
+                if (selection == null)
+                {
+                    _noteEntryListView.ClearSelection();
+                }
+                else
+                {
+                    int selectionIndex = _filteredNotes.IndexOf(selection);
+                    _noteEntryListView.selectedIndex = selectionIndex;
+                }
+            }
+
             _noteEntryListView.Rebuild();
         }
 

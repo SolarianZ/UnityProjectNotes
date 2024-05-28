@@ -71,7 +71,7 @@ namespace GBG.ProjectNotes.Editor
 
         private void OnFocus()
         {
-            UpdateViews();
+            UpdateViews(_noteEntryListView?.selectedItem as NoteEntry);
         }
 
         private void Update()
@@ -91,9 +91,38 @@ namespace GBG.ProjectNotes.Editor
         }
 
 
-        private void SaveNote(NoteEntry note)
+        private void SaveNote(NoteEntry noteToSave, bool isNewNote)
         {
-            UDebug.LogError($"TODO: OnSubmitNoteEntry: {note}");
+            if (!Settings)
+            {
+                return;
+            }
+
+            if (isNewNote)
+            {
+                Settings.Notes.Add(noteToSave);
+                Settings.ForceSave();
+                LocalCache.SelectedCategory = noteToSave.category;
+                UpdateViews(noteToSave);
+                UDebug.Log($"[Project Notes] New note added: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
+                return;
+            }
+
+            for (int i = 0; i < Settings.Notes.Count; i++)
+            {
+                NoteEntry note = Settings.Notes[i];
+                if (note.guid != noteToSave.guid)
+                {
+                    continue;
+                }
+
+                note.Update(noteToSave);
+                Settings.ForceSave();
+                UDebug.Log($"[Project Notes] Note updated: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
+                return;
+            }
+
+            UDebug.Log($"[Project Notes] Failed to add note: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
         }
 
         private void DeleteNote(NoteEntry noteToDelete, long timestampToDelete)
@@ -151,7 +180,7 @@ namespace GBG.ProjectNotes.Editor
                 else
                 {
                     UDebug.Log($"[Project Notes] Note deleted: {noteToDelete.title} {Utility.FormatTimestamp(timestampToDelete)}.");
-                    UpdateViews(false);
+                    UpdateViews((NoteEntry)_noteEntryListView.selectedItem);
                 }
             }
             else

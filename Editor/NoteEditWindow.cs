@@ -8,7 +8,7 @@ namespace GBG.ProjectNotes.Editor
 {
     public class NoteEditWindow : EditorWindow
     {
-        public static NoteEditWindow Open(NoteEntry note, Action<NoteEntry> onSave)
+        public static NoteEditWindow Open(NoteEntry note, Action<NoteEntry, bool> onSave)
         {
             _note = note;
             _onSave = onSave;
@@ -19,7 +19,8 @@ namespace GBG.ProjectNotes.Editor
 
 
         private static NoteEntry _note;
-        private static Action<NoteEntry> _onSave;
+        // param: note, isNewNote
+        private static Action<NoteEntry, bool> _onSave;
 
         public TextField _guidField;
         public LongField _timestampField;
@@ -152,7 +153,8 @@ namespace GBG.ProjectNotes.Editor
                 return;
             }
 
-            string message = _note == null
+            bool isNewNote = _note == null;
+            string message = isNewNote
                 ? "Once the settings is synced to the version control system, this note will be added to the project of all team members."
                 : "Once the settings is synced to the version control system, this note will be updated in the project of all team members.";
             if (!EditorUtility.DisplayDialog("Save note content?", message, "Save", "Cancel"))
@@ -160,7 +162,7 @@ namespace GBG.ProjectNotes.Editor
                 return;
             }
 
-            Action<NoteEntry> onSubmit = _onSave;
+            Action<NoteEntry, bool> onSubmit = _onSave;
             NoteEntry note = new NoteEntry
             {
                 guid = _guidField.value,
@@ -173,7 +175,7 @@ namespace GBG.ProjectNotes.Editor
             };
 
             Close();
-            onSubmit(note);
+            onSubmit(note, isNewNote);
         }
     }
 }

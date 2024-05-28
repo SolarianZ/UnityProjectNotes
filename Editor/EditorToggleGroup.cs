@@ -34,6 +34,17 @@ namespace GBG.ProjectNotes.Editor
             base.Remove(child);
         }
 
+        public new void Clear()
+        {
+            foreach (Toggle toggle in _toggles)
+            {
+                toggle.UnregisterValueChangedCallback(OnToggleValueChanged);
+            }
+            _toggles.Clear();
+
+            base.Clear();
+        }
+
 
         private void OnToggleValueChanged(ChangeEvent<bool> evt)
         {

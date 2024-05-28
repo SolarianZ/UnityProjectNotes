@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace GBG.ProjectNotes.Editor
 {
@@ -28,15 +29,21 @@ namespace GBG.ProjectNotes.Editor
             timestamp = Utility.NewTimestamp();
         }
 
-        public void UpdateContent(string newContent, bool addOldContentToHistory = true)
+        public void Update(NoteEntry newNote, bool addOldContentToHistory = true)
         {
+            Assert.IsTrue(newNote.guid == guid);
+
             if (addOldContentToHistory && contentHistory.Count < MaxHistoryLength)
             {
                 contentHistory.Add(new NoteHistory(timestamp, content));
             }
 
-            timestamp = Utility.NewTimestamp();
-            content = newContent;
+            timestamp = newNote.timestamp;
+            category = newNote.category;
+            author = newNote.author;
+            isDraft = newNote.isDraft;
+            title = newNote.title;
+            content = newNote.content;
         }
 
         public string GetTrimmedCategory() => category?.Trim();
