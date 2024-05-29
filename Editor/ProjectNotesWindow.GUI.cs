@@ -436,6 +436,11 @@ namespace GBG.ProjectNotes.Editor
                 else
                 {
                     int selectionIndex = _filteredNotes.IndexOf(selection);
+                    if (selectionIndex < 0)
+                    {
+                        Debug.LogError($"[Project Notes] Failed to select note: {selection.title} {Utility.FormatTimestamp(selection.timestamp)}.");
+                    }
+
                     _noteEntryListView.selectedIndex = selectionIndex;
                 }
             }

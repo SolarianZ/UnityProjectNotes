@@ -119,12 +119,13 @@ namespace GBG.ProjectNotes.Editor
 
                 note.Update(noteToSave);
                 Settings.ForceSave();
-                LocalCache.MarkAsRead(noteToSave.GetKey());
-                UDebug.Log($"[Project Notes] Note updated: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
+                LocalCache.MarkAsRead(note.GetKey());
+                UpdateViews(note);
+                UDebug.Log($"[Project Notes] Note updated: {note.title} {Utility.FormatTimestamp(note.timestamp)}.");
                 return;
             }
 
-            UDebug.Log($"[Project Notes] Failed to add note: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
+            UDebug.LogError($"[Project Notes] Failed to save note: {noteToSave.title} {Utility.FormatTimestamp(noteToSave.timestamp)}.");
         }
 
         private void DeleteNote(NoteEntry noteToDelete, long timestampToDelete)
@@ -197,7 +198,7 @@ namespace GBG.ProjectNotes.Editor
             }
             else
             {
-                UDebug.Log($"[Project Notes] Failed to delete note: {noteToDelete.title} {Utility.FormatTimestamp(timestampToDelete)}.");
+                UDebug.LogError($"[Project Notes] Failed to delete note: {noteToDelete.title} {Utility.FormatTimestamp(timestampToDelete)}.");
             }
         }
 
