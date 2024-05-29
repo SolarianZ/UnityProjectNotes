@@ -149,7 +149,7 @@ namespace GBG.ProjectNotes.Editor
 
 
         public static int MinTitleLength = 4;
-        public static int MinContentLength = 8;
+        public static int MinContentLength = 12;
 
         public static bool IsNiceTitle(string title, out string alert)
         {
