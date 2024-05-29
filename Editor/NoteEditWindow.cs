@@ -12,9 +12,11 @@ namespace GBG.ProjectNotes.Editor
         {
             NoteEditWindow window = GetWindow<NoteEditWindow>(true);
             window.Initialize(note, onSave); // Called after CreateGUI
-            //window.ShowModalUtility();
+            //window.ShowModalUtility(); Conflict with undo/redo
             return window;
         }
+
+        //private static NoteEditWindow _instance;
 
         public delegate void SaveNoteHandler(NoteEntry note, bool isNewNote);
 
@@ -36,6 +38,8 @@ namespace GBG.ProjectNotes.Editor
 
         private void OnEnable()
         {
+            //_instance = this;
+
             SetWindowTitle();
             minSize = new Vector2(400, 360);
         }
@@ -144,6 +148,18 @@ namespace GBG.ProjectNotes.Editor
             _serializedObject = null;
         }
 
+        //private void OnLostFocus()
+        //{
+        //    if (_instance)
+        //    {
+        //        _instance.Focus();
+        //        GUIContent message = EditorGUIUtility.IconContent("Warning@2x");
+        //        message.text = "Please close the note editing window\n" +
+        //                       "before switching to other windows.";
+        //        ShowNotification(message, 2);
+        //    }
+        //}
+
         private void Update()
         {
             if (_timestampField != null && _serializedNote != null)
@@ -172,6 +188,7 @@ namespace GBG.ProjectNotes.Editor
             _guidField.SetValueWithoutNotify(_serializedNote.guid);
             _timestampField.SetValueWithoutNotify(Utility.FormatTimestamp(_serializedNote.timestamp));
 
+            _serializedObject?.Dispose();
             _serializedObject = new SerializedObject(this);
             rootVisualElement.Bind(_serializedObject);
 
