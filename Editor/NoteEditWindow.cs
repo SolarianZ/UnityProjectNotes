@@ -8,28 +8,30 @@ namespace GBG.ProjectNotes.Editor
 {
     public class NoteEditWindow : EditorWindow
     {
-        public static NoteEditWindow Open(NoteEntry note, Action<NoteEntry, bool> onSave)
+        public static NoteEditWindow Open(NoteEntry note, SaveNoteHandler onSave)
         {
-            _note = note;
-            _onSave = onSave;
             NoteEditWindow window = GetWindow<NoteEditWindow>(true);
+            window.Initialize(note, onSave); // Called after CreateGUI
             //window.ShowModalUtility();
             return window;
         }
 
+        public delegate void SaveNoteHandler(NoteEntry note, bool isNewNote);
 
-        private static NoteEntry _note;
-        // param: note, isNewNote
-        private static Action<NoteEntry, bool> _onSave;
+        private SaveNoteHandler _onSave;
+        private bool _isNewNote;
+        [SerializeField]
+        private NoteEntry _serializedNote; // for undo/redo use
+        private SerializedObject _serializedObject;
 
-        public TextField _guidField;
-        public LongField _timestampField;
-        public TextField _categoryField;
-        public TextField _authorField;
-        public Toggle _draftField;
-        public IntegerField _priorityField;
-        public TextField _titleField;
-        public TextField _contentField;
+        private TextField _guidField;
+        private TextField _timestampField;
+        private TextField _categoryField;
+        private TextField _authorField;
+        private Toggle _draftField;
+        private IntegerField _priorityField;
+        private TextField _titleField;
+        private TextField _contentField;
 
 
         private void OnEnable()
@@ -51,16 +53,15 @@ namespace GBG.ProjectNotes.Editor
             const float LabelWidth = 70;
             _guidField = new TextField("Guid")
             {
-                value = _note?.guid ?? Utility.NewGuid(),
                 isReadOnly = true,
                 style = { unityTextAlign = TextAnchor.MiddleRight, },
             };
             _guidField.Q<Label>().style.minWidth = LabelWidth;
             scrollView.Add(_guidField);
 
-            _timestampField = new LongField("Timestamp")
+            //_timestampField = new LongField("Timestamp")
+            _timestampField = new TextField("Timestamp")
             {
-                value = Utility.NewTimestamp(),
                 isReadOnly = true,
                 style = { unityTextAlign = TextAnchor.MiddleRight, },
             };
@@ -69,7 +70,7 @@ namespace GBG.ProjectNotes.Editor
 
             _categoryField = new TextField("Category")
             {
-                value = _note?.categoryTrimmed,
+                bindingPath = $"{nameof(_serializedNote)}.{nameof(_serializedNote.category)}",
                 style = { unityTextAlign = TextAnchor.MiddleRight, },
             };
             _categoryField.Q<Label>().style.minWidth = LabelWidth;
@@ -77,7 +78,7 @@ namespace GBG.ProjectNotes.Editor
 
             _authorField = new TextField("Author")
             {
-                value = _note?.author ?? Environment.UserName,
+                bindingPath = $"{nameof(_serializedNote)}.{nameof(_serializedNote.author)}",
                 style = { unityTextAlign = TextAnchor.MiddleRight, },
             };
             _authorField.Q<Label>().style.minWidth = LabelWidth;
@@ -85,7 +86,7 @@ namespace GBG.ProjectNotes.Editor
 
             _draftField = new Toggle("Draft")
             {
-                value = _note?.isDraft ?? false,
+                bindingPath = $"{nameof(_serializedNote)}.{nameof(_serializedNote.isDraft)}",
                 style = { unityTextAlign = TextAnchor.MiddleRight, },
             };
             _draftField.Q<Label>().style.minWidth = LabelWidth;
@@ -93,7 +94,7 @@ namespace GBG.ProjectNotes.Editor
 
             _priorityField = new IntegerField("Priority")
             {
-                value = _note?.priority ?? 0,
+                bindingPath = $"{nameof(_serializedNote)}.{nameof(_serializedNote.priority)}",
                 style = { unityTextAlign = TextAnchor.MiddleRight, },
             };
             _priorityField.Q<Label>().style.minWidth = LabelWidth;
@@ -101,7 +102,7 @@ namespace GBG.ProjectNotes.Editor
 
             _titleField = new TextField("Title")
             {
-                value = _note?.title,
+                bindingPath = $"{nameof(_serializedNote)}.{nameof(_serializedNote.title)}",
                 style = { unityTextAlign = TextAnchor.MiddleRight, },
             };
             _titleField.Q<Label>().style.minWidth = LabelWidth;
@@ -109,7 +110,7 @@ namespace GBG.ProjectNotes.Editor
 
             _contentField = new TextField("Content")
             {
-                value = _note?.content,
+                bindingPath = $"{nameof(_serializedNote)}.{nameof(_serializedNote.content)}",
                 multiline = true,
                 style = { unityTextAlign = TextAnchor.MiddleRight, },
             };
@@ -138,13 +139,48 @@ namespace GBG.ProjectNotes.Editor
 
         private void OnDisable()
         {
-            _note = null;
             _onSave = null;
+            _serializedObject?.Dispose();
+            _serializedObject = null;
+        }
+
+        private void Update()
+        {
+            if (_timestampField != null && _serializedNote != null)
+            {
+                DateTime now = DateTime.Now;
+                _serializedNote.timestamp = now.Ticks;
+                _timestampField.SetValueWithoutNotify(now.ToString(Utility.DateTimeFormat));
+            }
+        }
+
+        private void Initialize(NoteEntry srcNote, SaveNoteHandler onSave)
+        {
+            _isNewNote = srcNote == null;
+            _onSave = onSave;
+            _serializedNote ??= new NoteEntry();
+            if (srcNote != null)
+            {
+                _serializedNote.CopyFrom(srcNote);
+            }
+            else
+            {
+                _serializedNote.guid = Utility.NewGuid();
+                _serializedNote.author = Environment.UserName;
+            }
+            _serializedNote.timestamp = Utility.NewTimestamp();
+            _guidField.SetValueWithoutNotify(_serializedNote.guid);
+            _timestampField.SetValueWithoutNotify(Utility.FormatTimestamp(_serializedNote.timestamp));
+
+            _serializedObject = new SerializedObject(this);
+            rootVisualElement.Bind(_serializedObject);
+
+            SetWindowTitle();
         }
 
         private void SetWindowTitle()
         {
-            if (_note == null)
+            if (_isNewNote)
             {
                 titleContent = new GUIContent("Add Note");
             }
@@ -162,8 +198,7 @@ namespace GBG.ProjectNotes.Editor
                 return;
             }
 
-            bool isNewNote = _note == null;
-            string message = isNewNote
+            string message = _isNewNote
                 ? "Once the settings is synced to the version control system, this note will be added to the project of all team members."
                 : "Once the settings is synced to the version control system, this note will be updated in the project of all team members.";
             if (!EditorUtility.DisplayDialog("Save note content?", message, "Save", "Cancel"))
@@ -171,21 +206,13 @@ namespace GBG.ProjectNotes.Editor
                 return;
             }
 
-            Action<NoteEntry, bool> onSubmit = _onSave;
-            NoteEntry note = new NoteEntry
-            {
-                guid = _guidField.value,
-                timestamp = _timestampField.value,
-                category = _categoryField.value?.Trim(),
-                author = _authorField.value,
-                isDraft = _draftField.value,
-                priority = _priorityField.value,
-                title = _titleField.value,
-                content = _contentField.value,
-            };
+            SaveNoteHandler onSubmit = _onSave;
+            NoteEntry note = new NoteEntry();
+            note.CopyFrom(_serializedNote);
 
             Close();
-            onSubmit(note, isNewNote);
+
+            onSubmit(note, _isNewNote);
         }
     }
 }

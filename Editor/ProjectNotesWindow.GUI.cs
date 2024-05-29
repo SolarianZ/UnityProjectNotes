@@ -14,7 +14,7 @@ namespace GBG.ProjectNotes.Editor
 
         private static bool _toolbarEntryRedDotIconVisible;
         private static Image _toolbarEntryRedDotIcon;
-        private static Vector3 _toolbarEntryRedDotIconTransitionScale = new Vector3(1.4f, 1.4f, 1.4f);
+        private static Vector3 _toolbarEntryRedDotIconTransitionScale = new Vector3(1.4f, 1.4f, 1f);
         private static float _isToolbarEntryRedDotIconTransitionDuration = 0.8f;
         private static bool _isToolbarEntryRedDotIconTransitToScale = true;
 

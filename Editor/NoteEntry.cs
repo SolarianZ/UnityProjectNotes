@@ -32,22 +32,37 @@ namespace GBG.ProjectNotes.Editor
             timestamp = Utility.NewTimestamp();
         }
 
-        public void Update(NoteEntry newNote, bool addOldContentToHistory = true)
+        public void Update(NoteEntry srcNote, bool addOldContentToHistory = true)
         {
-            Assert.IsTrue(newNote.guid == guid);
+            Assert.IsTrue(srcNote.guid == guid);
 
             if (addOldContentToHistory && contentHistory.Count < MaxHistoryLength)
             {
                 contentHistory.Add(new NoteHistory(timestamp, content));
             }
 
-            timestamp = newNote.timestamp;
-            category = newNote.category;
-            author = newNote.author;
-            isDraft = newNote.isDraft;
-            priority = newNote.priority;
-            title = newNote.title;
-            content = newNote.content;
+            timestamp = srcNote.timestamp;
+            category = srcNote.category;
+            author = srcNote.author;
+            isDraft = srcNote.isDraft;
+            priority = srcNote.priority;
+            title = srcNote.title;
+            content = srcNote.content;
+        }
+
+        public void CopyFrom(NoteEntry srcNote)
+        {
+            guid = srcNote.guid;
+            timestamp = srcNote.timestamp;
+            category = srcNote.category;
+            author = srcNote.author;
+            isDraft = srcNote.isDraft;
+            priority = srcNote.priority;
+            title = srcNote.title;
+            content = srcNote.content;
+            contentHistory ??= new List<NoteHistory>();
+            contentHistory.Clear();
+            contentHistory.AddRange(srcNote.contentHistory);
         }
 
         public NoteKey GetKey()
