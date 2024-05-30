@@ -297,7 +297,7 @@ namespace GBG.ProjectNotes.Editor
         {
             UpdateCategories(selection);
             UpdateFilteredNoteList(selection);
-            UpdateNodeContentView();
+            UpdateNoteContentView();
         }
 
         private void OnNoteReadStatusChanged(NoteEntry changedNote)
@@ -397,6 +397,7 @@ namespace GBG.ProjectNotes.Editor
             string category = toggle.text;
             LocalCache.SelectedCategory = category;
             UpdateFilteredNoteList(null);
+            UpdateNoteContentView();
         }
 
         #endregion
@@ -411,7 +412,7 @@ namespace GBG.ProjectNotes.Editor
             listItem.Bind(note);
         }
 
-        private void UnbindNoteListItemView(VisualElement element, int arg2)
+        private void UnbindNoteListItemView(VisualElement element, int index)
         {
             NoteListViewItemLabel listItem = (NoteListViewItemLabel)element;
             listItem.Unbind();
@@ -419,8 +420,7 @@ namespace GBG.ProjectNotes.Editor
 
         private void OnNoteEntryListSelectionChanged(IEnumerable<object> enumerable)
         {
-            NoteEntry note = (NoteEntry)_noteEntryListView.selectedItem;
-            _contentView.SetNote(note);
+            UpdateNoteContentView();
         }
 
         private void UpdateFilteredNoteList(NoteEntry selection)
@@ -480,14 +480,15 @@ namespace GBG.ProjectNotes.Editor
 
         #region Note Content View
 
-        private void UpdateNodeContentView()
+        private void UpdateNoteContentView()
         {
             if (_contentView == null)
             {
                 return;
             }
 
-            _contentView.RefreshView();
+            NoteEntry note = (NoteEntry)_noteEntryListView.selectedItem;
+            _contentView.SetNote(note);
         }
 
         #endregion
