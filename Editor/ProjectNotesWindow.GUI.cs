@@ -315,12 +315,26 @@ namespace GBG.ProjectNotes.Editor
 
         private void AddNewNote()
         {
-            NoteEditWindow.Open(null, SaveNote);
+            if (!Settings)
+            {
+                NoteEditWindow.Open(null, SaveNote, null);
+                return;
+            }
+
+            HashSet<string> categorySet = Settings.CollectCategories(false);
+            NoteEditWindow.Open(null, SaveNote, categorySet);
         }
 
         private void EditNote(NoteEntry note)
         {
-            NoteEditWindow.Open(note, SaveNote);
+            if (!Settings)
+            {
+                NoteEditWindow.Open(note, SaveNote, null);
+                return;
+            }
+
+            HashSet<string> categorySet = Settings.CollectCategories(false);
+            NoteEditWindow.Open(note, SaveNote, categorySet);
         }
 
 

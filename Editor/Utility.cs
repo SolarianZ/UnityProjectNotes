@@ -147,6 +147,23 @@ namespace GBG.ProjectNotes.Editor
             return categoryInfos;
         }
 
+        public static HashSet<string> CollectCategories(this ProjectNotesSettings settings, bool addCategoryAll)
+        {
+            HashSet<string> categories = new HashSet<string>();
+
+            if (addCategoryAll)
+            {
+                categories.Add(ProjectNotesSettings.CategoryAll);
+            }
+
+            foreach (NoteEntry note in settings.Notes)
+            {
+                categories.Add(note.categoryTrimmed);
+            }
+
+            return categories;
+        }
+
 
         public static int MinTitleLength = 4;
         public static int MinContentLength = 12;

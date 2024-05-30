@@ -207,13 +207,6 @@ namespace GBG.ProjectNotes.Editor
 
         void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
         {
-            // Settings
-            menu.AddItem(new GUIContent("Inspect Settings Asset"), false, () =>
-            {
-                Selection.activeObject = Settings;
-            });
-            menu.AddSeparator("");
-
             // Document
             menu.AddItem(new GUIContent("Unity Manual: Supported rich text tags"), false, () =>
             {
@@ -222,6 +215,10 @@ namespace GBG.ProjectNotes.Editor
             menu.AddSeparator("");
 
             // Debug
+            menu.AddItem(new GUIContent("[Debug] Inspect Settings Asset"), false, () =>
+            {
+                Selection.activeObject = Settings;
+            });
             menu.AddItem(new GUIContent("[Debug] Inspect Local Cache Asset"), false, () =>
             {
                 Selection.activeObject = LocalCache;

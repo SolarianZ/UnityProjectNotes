@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -8,10 +10,10 @@ namespace GBG.ProjectNotes.Editor
 {
     public class NoteEditWindow : EditorWindow
     {
-        public static NoteEditWindow Open(NoteEntry note, SaveNoteHandler onSave)
+        public static NoteEditWindow Open(NoteEntry note, SaveNoteHandler onSave, IEnumerable<string> existingCategories)
         {
             NoteEditWindow window = GetWindow<NoteEditWindow>(true);
-            window.Initialize(note, onSave); // Called after CreateGUI
+            window.Initialize(note, onSave, existingCategories); // Called after CreateGUI
             //window.ShowModalUtility(); Conflict with undo/redo
             return window;
         }
@@ -45,6 +47,7 @@ namespace GBG.ProjectNotes.Editor
         private TextField _guidField;
         private TextField _timestampField;
         private TextField _categoryField;
+        private ToolbarMenu _existingCategoryMenu;
         private Label _categoryAlertLabel;
         private TextField _authorField;
         private Label _authorAlertLabel;
@@ -61,7 +64,7 @@ namespace GBG.ProjectNotes.Editor
             //_instance = this;
 
             SetWindowTitle();
-            minSize = new Vector2(400, 360);
+            minSize = new Vector2(400, 400);
 
             AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
             AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
@@ -93,14 +96,27 @@ namespace GBG.ProjectNotes.Editor
             _timestampField.Q<Label>().style.minWidth = FieldLabelWidth;
             scrollView.Add(_timestampField);
 
+            VisualElement categoryContainer = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                },
+            };
+            scrollView.Add(categoryContainer);
             _categoryField = new TextField("Category")
             {
                 bindingPath = $"{nameof(_serializedNote)}.{nameof(_serializedNote.category)}",
-                style = { unityTextAlign = TextAnchor.MiddleRight, },
+                style = { flexGrow = 1, unityTextAlign = TextAnchor.MiddleRight, },
             };
             _categoryField.RegisterValueChangedCallback(OnCategoryChanged);
             _categoryField.Q<Label>().style.minWidth = FieldLabelWidth;
-            scrollView.Add(_categoryField);
+            categoryContainer.Add(_categoryField);
+            _existingCategoryMenu = new ToolbarMenu
+            {
+                style = { borderLeftWidth = 0, borderRightWidth = 0, },
+            };
+            categoryContainer.Add(_existingCategoryMenu);
             _categoryAlertLabel = CreateAlertLabel();
             scrollView.Add(_categoryAlertLabel);
 
@@ -208,7 +224,7 @@ namespace GBG.ProjectNotes.Editor
             }
         }
 
-        private void Initialize(NoteEntry srcNote, SaveNoteHandler onSave)
+        private void Initialize(NoteEntry srcNote, SaveNoteHandler onSave, IEnumerable<string> existingCategories)
         {
             _isNewNote = srcNote == null;
             _onSave = onSave;
@@ -225,6 +241,20 @@ namespace GBG.ProjectNotes.Editor
             _serializedNote.timestamp = Utility.NewTimestamp();
             _guidField.SetValueWithoutNotify(_serializedNote.guid);
             _timestampField.SetValueWithoutNotify(Utility.FormatTimestamp(_serializedNote.timestamp));
+
+            if (existingCategories != null && existingCategories.Any())
+            {
+                DropdownMenu menu = _existingCategoryMenu.menu;
+                //menu.ClearItems(); // Not available on Unity 2021
+                foreach (string category in existingCategories)
+                {
+                    menu.AppendAction(category, _ => _categoryField.value = category);
+                }
+            }
+            else
+            {
+                _existingCategoryMenu.style.display = DisplayStyle.None;
+            }
 
             _serializedObject?.Dispose();
             _serializedObject = new SerializedObject(this);
