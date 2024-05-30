@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.Toolbars;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -176,30 +177,24 @@ namespace GBG.ProjectNotes.Editor
             _mainViewContainer.StretchToParentSize();
 
 
-            #region Category
+            #region Toolbar
 
-            VisualElement categoryContainer = new VisualElement
+            Toolbar toolbar = new Toolbar
             {
-                name = "CategoryContainer",
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
+                style = { justifyContent = Justify.SpaceBetween },
             };
-            _mainViewContainer.Add(categoryContainer);
+            _mainViewContainer.Add(toolbar);
 
-            _categoryGroup = new EditorToggleGroup
+            ToolbarPopupSearchField searchField = new ToolbarPopupSearchField
             {
-                name = "CategoryGroup",
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    flexWrap = Wrap.Wrap,
-                    flexGrow = 1,
-                }
+                style = { flexGrow = 1, flexShrink = 1 },
             };
-            _categoryGroup.activeToggleChanged += UpdateSelectedCategory;
-            categoryContainer.Add(_categoryGroup);
+            searchField.RegisterValueChangedCallback(OnSearchContentChanged);
+            TextField searchTextField = searchField.Q<TextField>();
+            searchField.menu.AppendAction("Search Title", _ => searchField.value = SearchPattern_Title);
+            searchField.menu.AppendAction("Search Content", _ => searchField.value = SearchPattern_Content);
+            searchField.menu.AppendAction("Search Author", _ => searchField.value = SearchPattern_Author);
+            toolbar.Add(searchField);
 
             Button newNoteButton = new Button(AddNewNote)
             {
@@ -209,15 +204,33 @@ namespace GBG.ProjectNotes.Editor
                 {
                     alignSelf = Align.Center,
                     fontSize = 16,
-                    width = 20,
-                    height = 20,
+                    width = 18,
+                    height = 18,
                     borderTopLeftRadius = Utility.ButtonBorderRadius,
                     borderTopRightRadius = Utility.ButtonBorderRadius,
                     borderBottomLeftRadius = Utility.ButtonBorderRadius,
                     borderBottomRightRadius = Utility.ButtonBorderRadius,
                 }
             };
-            categoryContainer.Add(newNoteButton);
+            toolbar.Add(newNoteButton);
+
+            #endregion
+
+
+            #region Category
+
+            _categoryGroup = new EditorToggleGroup
+            {
+                name = "CategoryGroup",
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    flexWrap = Wrap.Wrap,
+                    //flexGrow = 1,
+                }
+            };
+            _categoryGroup.activeToggleChanged += UpdateSelectedCategory;
+            _mainViewContainer.Add(_categoryGroup);
 
             #endregion
 

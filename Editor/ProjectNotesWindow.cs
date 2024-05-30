@@ -10,6 +10,9 @@ namespace GBG.ProjectNotes.Editor
     {
         #region Static
 
+        public const string SearchPattern_Title = "title: ";
+        public const string SearchPattern_Content = "content: ";
+        public const string SearchPattern_Author = "author: ";
         public static ProjectNotesSettings Settings => ProjectNotesSettings.instance;
         internal static ProjectNotesLocalCache LocalCache => ProjectNotesLocalCache.instance;
         private static ProjectNotesWindow _windowInstance;
@@ -90,6 +93,11 @@ namespace GBG.ProjectNotes.Editor
             }
         }
 
+
+        private void OnSearchContentChanged(ChangeEvent<string> evt)
+        {
+            UDebug.LogError($"TODO : Search Notes '{evt.newValue}'");
+        }
 
         private void SaveNote(NoteEntry noteToSave, bool isNewNote)
         {
