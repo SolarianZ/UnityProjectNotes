@@ -216,10 +216,19 @@ namespace GBG.ProjectNotes.Editor
         void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
         {
             // Document
-            menu.AddItem(new GUIContent("Unity Manual: Supported rich text tags"), false, () =>
+            menu.AddItem(new GUIContent("Unity Manual: Supported Rich Text Tags"), false, () =>
             {
                 Application.OpenURL("https://docs.unity3d.com/Manual/UIE-supported-tags.html");
             });
+            menu.AddSeparator("");
+
+            // Toolbar Entry Button #1 Workaround
+            // TODO FIXME: Toolbar entry button disappered after changing Editor layout
+            menu.AddItem(new GUIContent("Create Toolbar Entry Button", "The toolbar entry button will disappear after changing the layout of Unity Editor, use this option to re-create the toolbar entry button."),
+                false, () =>
+                {
+                    TryCreateToolbarEntry(true);
+                });
             menu.AddSeparator("");
 
             // Debug

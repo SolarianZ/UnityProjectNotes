@@ -6,6 +6,7 @@ using UnityEditor.Toolbars;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UDebug = UnityEngine.Debug;
 
 namespace GBG.ProjectNotes.Editor
 {
@@ -20,9 +21,9 @@ namespace GBG.ProjectNotes.Editor
         private static bool _isToolbarEntryRedDotIconTransitToScale = true;
 
 
-        private static void TryCreateToolbarEntry()
+        private static void TryCreateToolbarEntry(bool forceRecreate = false)
         {
-            if (_toolbarEntryRedDotIcon != null)
+            if (_toolbarEntryRedDotIcon != null && !forceRecreate)
             {
                 return;
             }
@@ -33,9 +34,20 @@ namespace GBG.ProjectNotes.Editor
                 BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(toolbarObj);
             VisualElement toolbarZonePlayMode = toolbarRoot.Q("ToolbarZonePlayMode");
 
+            const string EntryButtonName = "ProjectNotesEntryButton";
+            if (forceRecreate)
+            {
+                EditorToolbarButton oldEntryButton = toolbarZonePlayMode.Q<EditorToolbarButton>(name: EntryButtonName);
+                if (oldEntryButton != null)
+                {
+                    toolbarZonePlayMode.Remove(oldEntryButton);
+                    UDebug.Log($"[Project Notes] Old toolbar entry button removed.");
+                }
+            }
+
             EditorToolbarButton entryButton = new EditorToolbarButton(Open)
             {
-                name = "ProjectNotesButton",
+                name = EntryButtonName,
                 icon = EditorGUIUtility.Load(EditorGUIUtility.isProSkin ? "d_console.infoicon.sml" : "console.infoicon.sml") as Texture2D,
                 style =
                     {
