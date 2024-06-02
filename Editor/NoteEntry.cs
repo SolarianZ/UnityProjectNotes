@@ -24,6 +24,7 @@ namespace GBG.ProjectNotes.Editor
         public List<NoteHistory> contentHistory = new List<NoteHistory>();
 
         public string categoryTrimmed => category?.Trim();
+        public long displayPriority { get; set; }
 
 
         // Allow to clear remote read status

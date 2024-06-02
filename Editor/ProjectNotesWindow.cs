@@ -10,9 +10,6 @@ namespace GBG.ProjectNotes.Editor
     {
         #region Static
 
-        public const string SearchPattern_Title = "title: ";
-        public const string SearchPattern_Content = "content: ";
-        public const string SearchPattern_Author = "author: ";
         public static ProjectNotesSettings Settings => ProjectNotesSettings.instance;
         internal static ProjectNotesLocalCache LocalCache => ProjectNotesLocalCache.instance;
         private static ProjectNotesWindow _windowInstance;
@@ -94,9 +91,20 @@ namespace GBG.ProjectNotes.Editor
         }
 
 
-        private void OnSearchContentChanged(ChangeEvent<string> evt)
+        private void PickNotes(string pattern)
         {
-            UDebug.LogError($"TODO : Search Notes '{evt.newValue}'");
+            Picker.Pick(_filteredNotes, pattern);
+
+            _filteredNotes.Sort((a, b) =>
+            {
+                if (a.displayPriority > b.displayPriority) return 1;
+                if (a.displayPriority < b.displayPriority) return -1;
+                return 0;
+            });
+
+            // TODO : Update Search Result
+            UDebug.LogError($"TODO: Update search result");
+            //UpdateViews(_noteEntryListView?.selectedItem as NoteEntry);
         }
 
         private void SaveNote(NoteEntry noteToSave, bool isNewNote)

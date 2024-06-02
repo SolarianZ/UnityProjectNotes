@@ -201,11 +201,11 @@ namespace GBG.ProjectNotes.Editor
             {
                 style = { flexGrow = 1, flexShrink = 1 },
             };
-            searchField.RegisterValueChangedCallback(OnSearchContentChanged);
+            searchField.RegisterValueChangedCallback(evt => PickNotes(evt.newValue));
             TextField searchTextField = searchField.Q<TextField>();
-            searchField.menu.AppendAction("Search Title", _ => searchField.value = SearchPattern_Title);
-            searchField.menu.AppendAction("Search Content", _ => searchField.value = SearchPattern_Content);
-            searchField.menu.AppendAction("Search Author", _ => searchField.value = SearchPattern_Author);
+            searchField.menu.AppendAction("Search Title", _ => searchField.value = Picker.Pattern_Title);
+            searchField.menu.AppendAction("Search Content", _ => searchField.value = Picker.Pattern_Content);
+            searchField.menu.AppendAction("Search Author", _ => searchField.value = Picker.Pattern_Author);
             toolbar.Add(searchField);
 
             Button newNoteButton = new Button(AddNewNote)
