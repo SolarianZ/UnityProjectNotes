@@ -1,8 +1,8 @@
 {
   "name": "com.greenbamboogames.projectnotes",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "displayName": "Project Notes!",
-  "description": "",
+  "description": "A small tool in Unity Editor to display notes, which can be used to share must-read information within a team.",
   "unity": "2021.3",
   "documentationUrl": "https://github.com/SolarianZ/UnityProjectNotes",
   "changelogUrl": "https://github.com/SolarianZ/UnityProjectNotes/releases",
@@ -12,12 +12,15 @@
     "Memo",
     "Tips",
     "Reminder",
-    "Hint"
+    "Hint",
+    "Must Read",
+    "Share",
+    "Team"
   ],
   "author": {
     "name": "ZQY",
     "email": "vdergow@hotmail.com",
-    "url": ""
+    "url": "https://github.com/SolarianZ"
   },
   "type": "tool",
   "hideInEditor": false
