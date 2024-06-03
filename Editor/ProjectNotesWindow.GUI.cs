@@ -141,6 +141,7 @@ namespace GBG.ProjectNotes.Editor
         private bool _createSettingsButtonVisible;
         private Button _createSettingsButton;
         private VisualElement _mainViewContainer;
+        private ToolbarPopupSearchField _searchField;
         private EditorToggleGroup _categoryGroup;
         private ListView _noteEntryListView;
         private NoteContentView _contentView;
@@ -197,16 +198,16 @@ namespace GBG.ProjectNotes.Editor
             };
             _mainViewContainer.Add(toolbar);
 
-            ToolbarPopupSearchField searchField = new ToolbarPopupSearchField
+            _searchField = new ToolbarPopupSearchField
             {
+                tooltip = "Search for notes in the currently selected category.",
                 style = { flexGrow = 1, flexShrink = 1 },
             };
-            searchField.RegisterValueChangedCallback(evt => PickNotes(evt.newValue));
-            TextField searchTextField = searchField.Q<TextField>();
-            searchField.menu.AppendAction("Search Title", _ => searchField.value = Picker.Pattern_Title);
-            searchField.menu.AppendAction("Search Content", _ => searchField.value = Picker.Pattern_Content);
-            searchField.menu.AppendAction("Search Author", _ => searchField.value = Picker.Pattern_Author);
-            toolbar.Add(searchField);
+            _searchField.RegisterValueChangedCallback(evt => UpdateViews(null));
+            _searchField.menu.AppendAction("Search Title", _ => _searchField.value = Picker.Pattern_Title);
+            _searchField.menu.AppendAction("Search Content", _ => _searchField.value = Picker.Pattern_Content);
+            _searchField.menu.AppendAction("Search Author", _ => _searchField.value = Picker.Pattern_Author);
+            toolbar.Add(_searchField);
 
             Button newNoteButton = new Button(AddNewNote)
             {
@@ -342,9 +343,10 @@ namespace GBG.ProjectNotes.Editor
         {
             if (!Settings)
             {
-                NoteEditWindow.Open(null, SaveNote, null);
                 return;
             }
+
+            _searchField.value = null;
 
             HashSet<string> categorySet = Settings.CollectCategories(false);
             NoteEditWindow.Open(null, SaveNote, categorySet);
@@ -445,24 +447,34 @@ namespace GBG.ProjectNotes.Editor
             _filteredNotes.Clear();
             foreach (NoteEntry newNote in Settings.Notes)
             {
-                if (LocalCache.SelectedCategory == ProjectNotesSettings.CategoryAll ||
-                    LocalCache.SelectedCategory == newNote.categoryTrimmed)
+                if (LocalCache.SelectedCategory != ProjectNotesSettings.CategoryAll &&
+                    LocalCache.SelectedCategory != newNote.categoryTrimmed)
                 {
-                    bool added = false;
-                    for (int i = _filteredNotes.Count - 1; i >= 0; i--)
+                    continue;
+                }
+
+                long searchMatchScore = 0;
+                string searchPattern = _searchField.value;
+                if (!Picker.Pick(newNote, searchPattern, ref searchMatchScore))
+                {
+                    continue;
+                }
+
+                newNote.displayPriority = searchMatchScore > 0 ? searchMatchScore : newNote.priority;
+                bool added = false;
+                for (int i = _filteredNotes.Count - 1; i >= 0; i--)
+                {
+                    NoteEntry note = _filteredNotes[i];
+                    if (note.displayPriority >= newNote.displayPriority)
                     {
-                        NoteEntry note = _filteredNotes[i];
-                        if (note.priority >= newNote.priority)
-                        {
-                            _filteredNotes.Insert(i + 1, newNote);
-                            added = true;
-                            break;
-                        }
+                        _filteredNotes.Insert(i + 1, newNote);
+                        added = true;
+                        break;
                     }
-                    if (!added)
-                    {
-                        _filteredNotes.Insert(0, newNote);
-                    }
+                }
+                if (!added)
+                {
+                    _filteredNotes.Insert(0, newNote);
                 }
             }
 

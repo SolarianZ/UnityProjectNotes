@@ -91,22 +91,6 @@ namespace GBG.ProjectNotes.Editor
         }
 
 
-        private void PickNotes(string pattern)
-        {
-            Picker.Pick(_filteredNotes, pattern);
-
-            _filteredNotes.Sort((a, b) =>
-            {
-                if (a.displayPriority > b.displayPriority) return 1;
-                if (a.displayPriority < b.displayPriority) return -1;
-                return 0;
-            });
-
-            // TODO : Update Search Result
-            UDebug.LogError($"TODO: Update search result");
-            //UpdateViews(_noteEntryListView?.selectedItem as NoteEntry);
-        }
-
         private void SaveNote(NoteEntry noteToSave, bool isNewNote)
         {
             if (!Settings)

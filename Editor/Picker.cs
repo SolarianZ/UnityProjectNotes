@@ -6,10 +6,111 @@ namespace GBG.ProjectNotes.Editor
 {
     internal static class Picker
     {
-        public const string Pattern_Title = "title: ";
-        public const string Pattern_Content = "content: ";
-        public const string Pattern_Author = "author: ";
+        public const string Pattern_Title = "title:";
+        public const string Pattern_Content = "content:";
+        public const string Pattern_Author = "author:";
 
+
+        #region Pick Single Note
+
+        public static bool Pick(NoteEntry note, string rawPattern, ref long score)
+        {
+            if (string.IsNullOrWhiteSpace(rawPattern))
+            {
+                score = -1;
+                return true;
+            }
+
+            rawPattern = rawPattern.Trim();
+
+            if (rawPattern.StartsWith(Pattern_Title, StringComparison.OrdinalIgnoreCase))
+            {
+                string pattern = rawPattern.Substring(Pattern_Title.Length);
+                return PickInTitle(note, pattern, ref score);
+            }
+
+            if (rawPattern.StartsWith(Pattern_Content, StringComparison.OrdinalIgnoreCase))
+            {
+                string pattern = rawPattern.Substring(Pattern_Content.Length);
+                return PickInContent(note, pattern, ref score);
+            }
+
+            if (rawPattern.StartsWith(Pattern_Author, StringComparison.OrdinalIgnoreCase))
+            {
+                string pattern = rawPattern.Substring(Pattern_Author.Length);
+                return PickInAuthor(note, pattern, ref score);
+            }
+
+            return PickInNote(note, rawPattern, ref score);
+        }
+
+        public static bool PickInNote(NoteEntry note, string pattern, ref long score)
+        {
+            if (string.IsNullOrWhiteSpace(pattern))
+            {
+                score = -1;
+                return true;
+            }
+
+            bool match = false;
+            long maxScore = int.MinValue;
+            if (FuzzySearch.FuzzyMatch(pattern, note.title, ref score))
+            {
+                match = true;
+                if (score > maxScore) { maxScore = score; }
+            }
+            if (FuzzySearch.FuzzyMatch(pattern, note.content, ref score))
+            {
+                match = true;
+                if (score > maxScore) { maxScore = score; }
+            }
+            if (FuzzySearch.FuzzyMatch(pattern, note.author, ref score))
+            {
+                match = true;
+                if (score > maxScore) { maxScore = score; }
+            }
+
+            score = maxScore;
+            return match;
+        }
+
+        public static bool PickInTitle(NoteEntry note, string pattern, ref long score)
+        {
+            if (string.IsNullOrWhiteSpace(pattern))
+            {
+                score = -1;
+                return true;
+            }
+
+            return FuzzySearch.FuzzyMatch(pattern, note.title, ref score);
+        }
+
+        public static bool PickInContent(NoteEntry note, string pattern, ref long score)
+        {
+            if (string.IsNullOrWhiteSpace(pattern))
+            {
+                score = -1;
+                return true;
+            }
+
+            return FuzzySearch.FuzzyMatch(pattern, note.content, ref score);
+        }
+
+        public static bool PickInAuthor(NoteEntry note, string pattern, ref long score)
+        {
+            if (string.IsNullOrWhiteSpace(pattern))
+            {
+                score = -1;
+                return true;
+            }
+
+            return FuzzySearch.FuzzyMatch(pattern, note.author, ref score);
+        }
+
+        #endregion
+
+
+        #region Pick in Collection
 
         public static void Pick(List<NoteEntry> notes, string rawPattern)
         {
@@ -169,5 +270,7 @@ namespace GBG.ProjectNotes.Editor
                 }
             }
         }
+
+        #endregion
     }
 }
