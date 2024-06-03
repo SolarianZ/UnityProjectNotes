@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if !UNITY_2022_3_OR_NEWER
+using UnityEditor.UIElements; // PopupField<T>
+#endif
 using UDebug = UnityEngine.Debug;
 
 namespace GBG.ProjectNotes.Editor
