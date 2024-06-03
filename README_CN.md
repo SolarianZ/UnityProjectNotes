@@ -1,4 +1,4 @@
-# Unity项目备忘
+# Unity项目备忘录
 
 [English](./README.md)
 
@@ -34,7 +34,9 @@ Unity 2021.3或更高版本。
 
 ## 安装
 
-// TODO
+[![openupm](https://img.shields.io/npm/v/com.greenbamboogames.projectnotes?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.cn/packages/com.greenbamboogames.projectnotes/)
+
+从 [OpenUPM](https://openupm.cn/packages/com.greenbamboogames.projectnotes) 安装，或者直接将此仓库克隆到项目的Packages文件夹下。
 
 
 ## 如何使用

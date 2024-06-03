@@ -1,6 +1,6 @@
 {
   "name": "com.greenbamboogames.projectnotes",
-  "version": "1.0.0-preview",
+  "version": "1.0.0",
   "displayName": "Project Notes!",
   "description": "A small tool in Unity Editor to display notes, which can be used to share must-read information within a team.",
   "unity": "2021.3",
