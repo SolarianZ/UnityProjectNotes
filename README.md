@@ -1,5 +1,7 @@
 # UnityProjectNotes
 
+[中文](./README_CN.md)
+
 A small utility within the Unity Editor to display notes, which can be used to share information across the team.
 
 > Have you ever been frustrated by your teammates frequently asking you the same questions? Try this.
