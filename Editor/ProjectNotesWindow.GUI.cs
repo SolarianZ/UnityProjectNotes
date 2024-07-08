@@ -48,17 +48,19 @@ namespace GBG.ProjectNotes.Editor
             EditorToolbarButton entryButton = new EditorToolbarButton(Open)
             {
                 name = EntryButtonName,
-                icon = EditorGUIUtility.Load(EditorGUIUtility.isProSkin ? "d_console.infoicon.sml" : "console.infoicon.sml") as Texture2D,
+                icon = EditorGUIUtility.Load("Clipboard") as Texture2D,
                 style =
-                    {
-                        marginLeft = 8,
-                        marginRight = 8,
-                    }
+                {
+                    marginLeft = 8,
+                    marginRight = 8,
+                }
             };
             toolbarZonePlayMode.Insert(0, entryButton);
 
             Image entryIconImage = entryButton.Q<Image>();
             entryIconImage.style.alignItems = Align.FlexEnd;
+            entryIconImage.style.width = 14;
+            entryIconImage.style.height = 14;
 
             _toolbarEntryRedDotIconVisible = false;
             _toolbarEntryRedDotIcon = new Image

@@ -61,7 +61,7 @@ namespace GBG.ProjectNotes.Editor
 
         private void OnEnable()
         {
-            titleContent = EditorGUIUtility.IconContent(EditorGUIUtility.isProSkin ? "d_console.infoicon.sml" : "console.infoicon.sml");
+            titleContent = EditorGUIUtility.IconContent("Clipboard");
             titleContent.text = "Project Notes";
             minSize = new Vector2(200, 200);
 
